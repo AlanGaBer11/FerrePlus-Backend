@@ -5,6 +5,9 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
+// IMPORAR RUTAS
+const userRoute = require("./routes/userRoute");
+
 // INICIALIZAR LA APLICACIÓN
 const app = express();
 // CAPA DE SEGURIDAD
@@ -34,6 +37,9 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => {
   res.send("Bienvenido a FerrePlus");
 });
+
+// RUTAS
+app.use("/api/users", userRoute);
 
 // INICIAR EL SERVIDOR
 app.listen(PORT, () => {
