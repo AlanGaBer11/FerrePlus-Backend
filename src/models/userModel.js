@@ -12,7 +12,7 @@ const getAllUsers = async () => {
   }
 };
 
-// FUNCIÓN PAARA OBTENER UN USUARIO POR ID
+// FUNCIÓN PARA OBTENER UN USUARIO POR ID
 const getUserById = async (id) => {
   try {
     const result = await db.query("SELECT * FROM users WHERE id_user = $1", [
@@ -34,7 +34,7 @@ const registerUser = async (userData) => {
       email,
     ]);
     if (emailCheck.rows.length > 0) {
-      throw new Error("El Email Ya Está Registrado");
+      throw new Error("El email ya está registrado");
     }
 
     // HASHEAMOS LA CONTRASEÑA
@@ -45,11 +45,11 @@ const registerUser = async (userData) => {
       "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *",
       [name, email, hashedPassword]
     );
-
+    //
     return result.rows[0];
-  } catch (error) {
-    console.error("Error al registrar usuario:", error);
-    throw error;
+  } catch (err) {
+    console.error("Error al registrar usuario:", err);
+    throw err;
   }
 };
 
@@ -72,13 +72,14 @@ const loginUser = async (email, password) => {
     }
 
     return user;
-  } catch (error) {
-    console.error("Error al iniciar sesión:", error);
-    throw error;
+  } catch (err) {
+    console.error("Error al iniciar sesión:", err);
+    throw err;
   }
 };
 
 // FUNCIÓN PARA ACTUALIZAR UN USUARIO (ACTUALIZA TODOS LOS CAMPOS)
+//! HACER QUE MANDE UN CODIGO DE VERIFICACIÓN AL CORREO PARA ACTUALIZAR LOS DATOS
 const updateUser = async (id, userData) => {
   const { name, email, password } = userData;
   try {
@@ -87,7 +88,7 @@ const updateUser = async (id, userData) => {
       id,
     ]);
     if (userCheck.rows.length === 0) {
-      throw new Error("El Usuario No Existe");
+      throw new Error("El usuario no existe");
     }
 
     // Hashear la nueva contraseña si se proporciona
@@ -103,9 +104,9 @@ const updateUser = async (id, userData) => {
     );
 
     return result.rows[0];
-  } catch (error) {
-    console.error("Error al actualizar el usuario:", error);
-    throw error;
+  } catch (err) {
+    console.error("Error al actualizar el usuario:", err);
+    throw err;
   }
 };
 
@@ -120,9 +121,9 @@ const deleteUser = async (id) => {
       throw new Error("El Usuario No Existe");
     }
     return result.rows[0];
-  } catch (error) {
-    console.error("Error al eliminar el usuario:", error);
-    throw error;
+  } catch (err) {
+    console.error("Error al eliminar el usuario:", err);
+    throw err;
   }
 };
 

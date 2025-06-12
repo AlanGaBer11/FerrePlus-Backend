@@ -7,16 +7,16 @@ const getAllUsers = async (req, res) => {
     if (!users || users.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "No Hay Usuarios" });
+        .json({ success: false, message: "No hay usuarios" });
     }
     res
       .status(200)
-      .json({ success: true, message: "Usuarios Obtenidos", users });
+      .json({ success: true, message: "Usuarios obtenidos", users });
   } catch (error) {
-    console.error("Error Al Obtener Los Usuarios", error);
+    console.error("Error al obtener los usuarios", error);
     res
       .status(500)
-      .json({ success: false, message: "Error Interno Del Servidor" });
+      .json({ success: false, message: "Error interno del servidor" });
   }
 };
 
@@ -26,14 +26,14 @@ const getUserById = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "Usuario No Encontrado" });
+        .json({ success: false, message: "Usuario no encontrado" });
     }
-    res.status(200).json({ success: true, message: "Usuario Obtenido", user });
+    res.status(200).json({ success: true, message: "Usuario obtenido", user });
   } catch (error) {
-    console.error("Error Al Obtener El Usuario", error);
+    console.error("Error al obtener el usuario", error);
     res
       .status(500)
-      .json({ success: false, message: "Error Interno Del Servidor" });
+      .json({ success: false, message: "Error interno del servidor" });
   }
 };
 
@@ -43,17 +43,17 @@ const registerUser = async (req, res) => {
     if (!name || !email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Los Datos Son Obligatorios" });
+        .json({ success: false, message: "Todos los campos son obligatorios" });
     }
     const newUser = await userService.registerUser(name, email, password);
     res
       .status(201)
-      .json({ success: true, message: "Usuario Registrado", user: newUser });
+      .json({ success: true, message: "Usuario registrado", user: newUser });
   } catch (error) {
-    console.error("Error Al Registrar El Usuario", error);
+    console.error("Error al registrar el usuario", error);
 
     // Si es un error de email duplicado
-    if (error.message === "El Email Ya Está Registrado") {
+    if (error.message === "El email ya está registrado") {
       return res.status(409).json({ success: false, message: error.message });
     }
 
@@ -69,7 +69,7 @@ const loginUser = async (req, res) => {
     if (!email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Email y Password Son Obligatorios" });
+        .json({ success: false, message: "Email y Password son obligatorios" });
     }
     const user = await userService.loginUser(email, password);
     // Generar token
@@ -78,23 +78,23 @@ const loginUser = async (req, res) => {
     });
     res.status(200).json({
       success: true,
-      message: "Inicio De Sesión Exitoso",
+      message: "Inicio de sesión exitoso",
       token,
       user,
     });
   } catch (error) {
-    console.error("Error Al Iniciar Sesión", error);
+    console.error("Error al iniciar sesión", error);
     // Si el error es de autenticación, enviamos 401
     if (
-      error.message === "El Usuario No Existe" ||
-      error.message === "Contraseña Incorrecta"
+      error.message === "El usuario no existe" ||
+      error.message === "Contraseña incorrecta"
     ) {
       return res.status(401).json({ success: false, message: error.message });
     }
 
     res
       .status(500)
-      .json({ success: false, message: "Error Interno Del Servidor" });
+      .json({ success: false, message: "Error interno del servidor" });
   }
 };
 
@@ -106,16 +106,16 @@ const updateUser = async (req, res) => {
     if (!updatedUser) {
       return res
         .status(404)
-        .json({ success: false, error: "Usuario No Encontrado" });
+        .json({ success: false, error: "Usuario no encontrado" });
     }
     res
       .status(200)
-      .json({ success: true, message: "Usuario Actualizado", updatedUser });
+      .json({ success: true, message: "Usuario actualizado", updatedUser });
   } catch (error) {
-    console.error("Error Al Actualizar El Usuario", error);
+    console.error("Error al actualizar el usuario", error);
     res
       .status(500)
-      .json({ success: false, message: "Error Interno Del Servidor" });
+      .json({ success: false, message: "Error interno del servidor" });
   }
 };
 
@@ -125,14 +125,14 @@ const deleteUser = async (req, res) => {
     if (!deletedUser) {
       return res
         .status(404)
-        .json({ success: false, message: "Usuario No Encontrado" });
+        .json({ success: false, message: "Usuario no encontrado" });
     }
-    res.status(200).json({ success: true, message: "Usuario Eliminado" });
+    res.status(200).json({ success: true, message: "Usuario eliminado" });
   } catch (error) {
-    console.error("Error Al Eliminar El Usuario", error);
+    console.error("Error al eliminar el usuario", error);
     res
       .status(500)
-      .json({ success: false, message: "Error Interno Del Servidor" });
+      .json({ success: false, message: "Error interno del servidor" });
   }
 };
 
