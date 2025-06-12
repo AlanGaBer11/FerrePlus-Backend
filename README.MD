@@ -38,3 +38,22 @@ En la terminal de este proyecto hacer `npm install` para instalar las dependenci
 - `npm helmet` - Protege la APP de vulnerabilidades de XSS
 - `npm standard --save-dev` - Asegura la consistncia y calidad del código
 - `npm nodemailer` - Enviar correos electrónicos
+
+# Endpoints
+
+## Users
+
+| Método | Endpoint                   | Descripción                |
+| ------ | -------------------------- | -------------------------- |
+| GET    | `/api/user/getUsers`       | Obtiene todos los usuarios |
+| GET    | `/api/user/getUser/:id`    | Obtiene un usuario por ID  |
+| POST   | `/api/user/register`       | Registra un nuevo usuario  |
+| POST   | `/api/user/login`          | Logea un usuario           |
+| PATCH  | `/api/user/updateUser/:id` | Actualiza un usuario       |
+| DELETE | `/api/user/deleteUser/:id` | Elimina un usuario         |
+
+## Suppliers
+
+## Products
+
+## Movements
