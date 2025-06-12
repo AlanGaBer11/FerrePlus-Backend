@@ -53,7 +53,7 @@ const createSupplier = async (req, res) => {
       email
     );
     res
-      .status(200)
+      .status(201)
       .json({ succes: true, message: "Proveedor creado", newSupplier });
   } catch (err) {
     console.error("Error al crear el proveedor", err);

@@ -6,15 +6,15 @@ Este proyecto es una API RESTful construida con **Node.js** y **Express**, con u
 
 - **`/config`**: Aquí se encuentra la configuración general del proyecto, como la conexión a la base de datos.
 
-- **`/models`**: Este directorio contiene los modelos de datos, que definen los esquemas para la base de datos.
+- **`/models`**: Este directorio contiene los modelos de datos que interactúan directamente con la base de datos PostgreSQL. Los modelos encapsulan las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) y otras consultas específicas a las tablas de la base de datos. Por ejemplo, `userModel.js` incluye funciones como `getAllUsers()`, `getUserById()`, `registerUser()`, `loginUser()`, `updateUser()`, y `deleteUser()`, que ejecutan consultas SQL y manejan la lógica de bajo nivel como el hash de contraseñas con bcrypt.
 
-- **`/services`**: En este directorio se encuentra la lógica de negocio que interactúa con los modelos. Los servicios contienen las funciones que realizan operaciones sobre los datos, como consultas, inserciones o actualizaciones.
+- **`/services`**: En este directorio se encuentra la capa de servicios que actúa como intermediario entre los controladores y los modelos. Los servicios implementan la lógica de negocio y abstraen las operaciones de datos de los controladores. Por ejemplo, `userService.js` proporciona una interfaz más limpia para las operaciones relacionadas con usuarios, manejando errores específicos del dominio y transformando los datos según sea necesario antes de pasarlos a la capa del modelo o devolverlos al controlador.
 
 - **`/controller`**: Este directorio contiene los controladores que gestionan la lógica de cada ruta. Los controladores reciben las solicitudes, interactúan con los servicios y devuelven las respuestas adecuadas.
 
 - **`/routes`**: En este directorio se encuentran los archivos que definen las rutas o endpoints de la API. Cada archivo de ruta está vinculado a un controlador o conjunto de funcionalidades específicas.
 
-- **`/middlewares`**: En este directorio se encuentran los middlewares personalizados que se pueden usar para validar o autenticar las solicitudes antes de que lleguen a los controladores.
+- **`/middlewares`**: En este directorio se encuentran los middlewares personalizados que se pueden usar para autenticar las solicitudes antes de que lleguen a los controladores.
 
 - **`/validators`**: En este directorio se encuentran los validators personalizados que se utilizan para validar los datos de entrada de las solicitudes HTTP. Estos validators definen las reglas de validación para los campos de formularios, parámetros de consulta y datos del cuerpo de las peticiones, asegurando que cumplan con los formatos, tipos y restricciones requeridas antes de ser procesados por los controladores.
 

@@ -8,6 +8,7 @@ const helmet = require("helmet");
 // IMPORAR RUTAS
 const userRoute = require("./routes/userRoute");
 const supplierRoute = require("./routes/supplierRoute");
+const productRoute = require("./routes/productRoutes");
 
 // INICIALIZAR LA APLICACIÓN
 const app = express();
@@ -42,6 +43,7 @@ app.get("/", (req, res) => {
 // RUTAS
 app.use("/api/users", userRoute);
 app.use("/api/suppliers", supplierRoute);
+app.use("/api/products", productRoute);
 
 // INICIAR EL SERVIDOR
 app.listen(PORT, () => {

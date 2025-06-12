@@ -83,7 +83,7 @@ const deleteSupplier = async (id) => {
     }
     return result.rows[0];
   } catch (err) {
-    console.error("Error al eliminar el usuario:", err);
+    console.error("Error al eliminar el provvedor:", err);
     throw err;
   }
 };
