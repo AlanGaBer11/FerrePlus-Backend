@@ -54,6 +54,14 @@ En la terminal de este proyecto hacer `npm install` para instalar las dependenci
 
 ## Suppliers
 
+| Método | Endpoint                            | Descripción                   |
+| ------ | ----------------------------------- | ----------------------------- |
+| GET    | `/api/suppliers/getSuppliers`       | Obtiene todos los proveedores |
+| GET    | `/api/suppliers/getSupplier/:id`    | Obtiene un proveedor por ID   |
+| POST   | `/api/suppliers/createSuppliers`    | Crea un nuevo proveedor       |
+| PATCH  | `/api/suppliers/updateSupplier/:id` | Actualiza un proveedor        |
+| DELETE | `/api/suppliers/deleteSupplier/:id` | Elimina un proveedor          |
+
 ## Products
 
 ## Movements
