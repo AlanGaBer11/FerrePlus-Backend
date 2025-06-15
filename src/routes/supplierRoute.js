@@ -11,11 +11,7 @@ router
     validation.createSupplierValidator,
     supplierController.createSupplier
   )
-  .patch(
-    "/updateSupplier/:id",
-    validation.createSupplierValidator,
-    supplierController.updatedSupplier
-  )
+  .patch("/updateSupplier/:id", supplierController.updatedSupplier)
   .delete("/deleteSupplier/:id", supplierController.deleteSupplier);
 
 module.exports = router;

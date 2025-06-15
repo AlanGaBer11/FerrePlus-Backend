@@ -64,4 +64,27 @@ En la terminal de este proyecto hacer `npm install` para instalar las dependenci
 
 ## Products
 
+| Método | Endpoint                          | Descripción                 |
+| ------ | --------------------------------- | --------------------------- |
+| GET    | `/api/products/getProducts`       | Obtiene todos los productos |
+| GET    | `/api/products/getProduct/:id`    | Obtiene un producto por ID  |
+| POST   | `/api/products/createProduct`     | Crea un nuevo producto      |
+| PATCH  | `/api/products/updateProduct/:id` | Actualiza un producto       |
+| DELETE | `/api/products/deleteProduct/:id` | Elimina un producto         |
+
 ## Movements
+
+| Método | Endpoint                            | Descripción                   |
+| ------ | ----------------------------------- | ----------------------------- |
+| GET    | `/api/movements/getMovements`       | Obtiene todos los movimientos |
+| GET    | `/api/movements/getMovement/:id`    | Obtiene un movimiento por ID  |
+| POST   | `/api/movements/createMovement`     | Crea un nuevo movimiento      |
+| PATCH  | `/api/movements/updateMovement/:id` | Actualiza un movimiento       |
+| DELETE | `/api/movements/deleteMovement/:id` | Elimina un movimiento         |
+
+# Seguridad
+
+- Se usa **bcryptjs** para encriptar contraseñas.
+- Se usa **JWT (jsonwebtoken)** para autenticar usuarios.
+- Se usa **helmet** para proteger la app de ataques XSS.
+- Se usa **express-rate-limit** para limitar el número de peticiones a la API.

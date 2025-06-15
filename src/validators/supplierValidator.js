@@ -1,10 +1,13 @@
 const { check, validationResult } = require("express-validator");
+
 const createSupplierValidator = [
   check("name")
     .notEmpty()
     .withMessage("El nombre es obligatorio")
     .isLength({ min: 8 })
-    .withMessage("El nombre debe tener al menos 8 caracteres"),
+    .withMessage("El nombre debe tener al menos 8 caracteres")
+    .matches(/^[a-zA-Z\s]+$/)
+    .withMessage("El nombre debe contener solo letras y espacios"),
 
   check("phone")
     .notEmpty()
@@ -13,6 +16,7 @@ const createSupplierValidator = [
     .withMessage("El teléfono debe tener al menos 10 caracteres")
     .matches(/^\d+$/)
     .withMessage("El teléfono debe contener solo números"),
+
   check("address")
     .notEmpty()
     .withMessage("La dirección es obligatoria")
@@ -22,6 +26,7 @@ const createSupplierValidator = [
     .withMessage(
       "La dirección debe contener solo letras, números y caracteres especiales como , . # -"
     ),
+
   check("email")
     .notEmpty()
     .withMessage("El email es obligatorio")

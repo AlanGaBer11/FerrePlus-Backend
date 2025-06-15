@@ -5,13 +5,16 @@ const registerUserValidator = [
     .notEmpty()
     .withMessage("El nombre es obligatorio")
     .isLength({ min: 3 })
-    .withMessage("El nombre debe tener al menos 3 caracteres"),
+    .withMessage("El nombre debe tener al menos 3 caracteres")
+    .matches(/^[a-zA-Z\s]+$/)
+    .withMessage("El nombre debe contener solo letras y espacios"),
 
   check("email")
     .notEmpty()
     .withMessage("El email es obligatorio")
     .isEmail()
     .withMessage("El email debe ser válido"),
+
   check("password")
     .notEmpty()
     .withMessage("La contraseña es obligatoria")
