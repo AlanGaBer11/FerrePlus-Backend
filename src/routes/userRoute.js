@@ -1,26 +1,26 @@
-const express = require("express");
-const router = express.Router();
-const userController = require("../controllers/userController");
-const validation = require("../validators/userValidator");
+const express = require('express')
+const router = express.Router()
+const userController = require('../controllers/userController')
+const validation = require('../validators/userValidator')
 
 router
   .get(
-    "/getUsers",
+    '/getUsers',
 
     userController.getAllUsers
   )
-  .get("/getUser/:id", userController.getUserById)
+  .get('/getUser/:id', userController.getUserById)
   .post(
-    "/register",
+    '/register',
     validation.registerUserValidator,
     userController.registerUser
   )
-  .post("/login", validation.loginUserValidator, userController.loginUser)
-  .patch("/updateUser/:id", userController.updateUser)
+  .post('/login', validation.loginUserValidator, userController.loginUser)
+  .patch('/updateUser/:id', userController.updateUser)
   .delete(
-    "/deleteUser/:id",
+    '/deleteUser/:id',
 
     userController.deleteUser
-  );
+  )
 
-module.exports = router;
+module.exports = router

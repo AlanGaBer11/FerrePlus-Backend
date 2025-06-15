@@ -1,45 +1,45 @@
-const { check, validationResult } = require("express-validator");
+const { check, validationResult } = require('express-validator')
 
 const createSupplierValidator = [
-  check("name")
+  check('name')
     .notEmpty()
-    .withMessage("El nombre es obligatorio")
+    .withMessage('El nombre es obligatorio')
     .isLength({ min: 8 })
-    .withMessage("El nombre debe tener al menos 8 caracteres")
+    .withMessage('El nombre debe tener al menos 8 caracteres')
     .matches(/^[a-zA-Z\s]+$/)
-    .withMessage("El nombre debe contener solo letras y espacios"),
+    .withMessage('El nombre debe contener solo letras y espacios'),
 
-  check("phone")
+  check('phone')
     .notEmpty()
-    .withMessage("El teléfono es obligatorio")
+    .withMessage('El teléfono es obligatorio')
     .isLength({ min: 10 })
-    .withMessage("El teléfono debe tener al menos 10 caracteres")
+    .withMessage('El teléfono debe tener al menos 10 caracteres')
     .matches(/^\d+$/)
-    .withMessage("El teléfono debe contener solo números"),
+    .withMessage('El teléfono debe contener solo números'),
 
-  check("address")
+  check('address')
     .notEmpty()
-    .withMessage("La dirección es obligatoria")
+    .withMessage('La dirección es obligatoria')
     .isLength({ min: 10 })
-    .withMessage("La dirección debe tener al menos 10 caracteres")
+    .withMessage('La dirección debe tener al menos 10 caracteres')
     .matches(/^[a-zA-Z0-9\s,.#-]+$/)
     .withMessage(
-      "La dirección debe contener solo letras, números y caracteres especiales como , . # -"
+      'La dirección debe contener solo letras, números y caracteres especiales como , . # -'
     ),
 
-  check("email")
+  check('email')
     .notEmpty()
-    .withMessage("El email es obligatorio")
+    .withMessage('El email es obligatorio')
     .isEmail()
-    .withMessage("El email debe ser válido"),
+    .withMessage('El email debe ser válido'),
 
   (req, res, next) => {
-    const errors = validationResult(req);
+    const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
+      return res.status(400).json({ success: false, errors: errors.array() })
     }
-    next();
-  },
-];
+    next()
+  }
+]
 
-module.exports = { createSupplierValidator };
+module.exports = { createSupplierValidator }

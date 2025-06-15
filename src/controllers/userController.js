@@ -1,140 +1,140 @@
-const userService = require("../services/userService");
-const jwt = require("jsonwebtoken");
+const userService = require('../services/userService')
+const jwt = require('jsonwebtoken')
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await userService.getAllUsers();
+    const users = await userService.getAllUsers()
     if (!users || users.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "No hay usuarios" });
+        .json({ success: false, message: 'No hay usuarios' })
     }
     res
       .status(200)
-      .json({ success: true, message: "Usuarios obtenidos", users });
+      .json({ success: true, message: 'Usuarios obtenidos', users })
   } catch (error) {
-    console.error("Error al obtener los usuarios", error);
+    console.error('Error al obtener los usuarios', error)
     res
       .status(500)
-      .json({ success: false, message: "Error interno del servidor" });
+      .json({ success: false, message: 'Error interno del servidor' })
   }
-};
+}
 
 const getUserById = async (req, res) => {
   try {
-    const user = await userService.getUserById(req.params.id);
+    const user = await userService.getUserById(req.params.id)
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "Usuario no encontrado" });
+        .json({ success: false, message: 'Usuario no encontrado' })
     }
-    res.status(200).json({ success: true, message: "Usuario obtenido", user });
+    res.status(200).json({ success: true, message: 'Usuario obtenido', user })
   } catch (error) {
-    console.error("Error al obtener el usuario", error);
+    console.error('Error al obtener el usuario', error)
     res
       .status(500)
-      .json({ success: false, message: "Error interno del servidor" });
+      .json({ success: false, message: 'Error interno del servidor' })
   }
-};
+}
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body
     if (!name || !email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Todos los campos son obligatorios" });
+        .json({ success: false, message: 'Todos los campos son obligatorios' })
     }
-    const newUser = await userService.registerUser(name, email, password);
+    const newUser = await userService.registerUser(name, email, password)
     res
       .status(201)
-      .json({ success: true, message: "Usuario registrado", user: newUser });
+      .json({ success: true, message: 'Usuario registrado', user: newUser })
   } catch (error) {
-    console.error("Error al registrar el usuario", error);
+    console.error('Error al registrar el usuario', error)
 
     // Si es un error de email duplicado
-    if (error.message === "El email ya está registrado") {
-      return res.status(409).json({ success: false, message: error.message });
+    if (error.message === 'El email ya está registrado') {
+      return res.status(409).json({ success: false, message: error.message })
     }
 
     res
       .status(500)
-      .json({ success: false, message: "Error Interno Del Servidor" });
+      .json({ success: false, message: 'Error Interno Del Servidor' })
   }
-};
+}
 
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body
     if (!email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Email y Password son obligatorios" });
+        .json({ success: false, message: 'Email y Password son obligatorios' })
     }
-    const user = await userService.loginUser(email, password);
+    const user = await userService.loginUser(email, password)
     // Generar token
     const token = jwt.sign({ id: user.id_user }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+      expiresIn: '1h'
+    })
     res.status(200).json({
       success: true,
-      message: "Inicio de sesión exitoso",
+      message: 'Inicio de sesión exitoso',
       token,
-      user,
-    });
+      user
+    })
   } catch (error) {
-    console.error("Error al iniciar sesión", error);
+    console.error('Error al iniciar sesión', error)
     // Si el error es de autenticación, enviamos 401
     if (
-      error.message === "El usuario no existe" ||
-      error.message === "Contraseña incorrecta"
+      error.message === 'El usuario no existe' ||
+      error.message === 'Contraseña incorrecta'
     ) {
-      return res.status(401).json({ success: false, message: error.message });
+      return res.status(401).json({ success: false, message: error.message })
     }
 
     res
       .status(500)
-      .json({ success: false, message: "Error interno del servidor" });
+      .json({ success: false, message: 'Error interno del servidor' })
   }
-};
+}
 
 const updateUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, email, password } = req.body;
-    const updatedUser = await userService.updateUser(id, name, email, password);
+    const { id } = req.params
+    const { name, email, password } = req.body
+    const updatedUser = await userService.updateUser(id, name, email, password)
     if (!updatedUser) {
       return res
         .status(404)
-        .json({ success: false, error: "Usuario no encontrado" });
+        .json({ success: false, error: 'Usuario no encontrado' })
     }
     res
       .status(200)
-      .json({ success: true, message: "Usuario actualizado", updatedUser });
+      .json({ success: true, message: 'Usuario actualizado', updatedUser })
   } catch (error) {
-    console.error("Error al actualizar el usuario", error);
+    console.error('Error al actualizar el usuario', error)
     res
       .status(500)
-      .json({ success: false, message: "Error interno del servidor" });
+      .json({ success: false, message: 'Error interno del servidor' })
   }
-};
+}
 
 const deleteUser = async (req, res) => {
   try {
-    const deletedUser = await userService.deleteUser(req.params.id);
+    const deletedUser = await userService.deleteUser(req.params.id)
     if (!deletedUser) {
       return res
         .status(404)
-        .json({ success: false, message: "Usuario no encontrado" });
+        .json({ success: false, message: 'Usuario no encontrado' })
     }
-    res.status(200).json({ success: true, message: "Usuario eliminado" });
+    res.status(200).json({ success: true, message: 'Usuario eliminado' })
   } catch (error) {
-    console.error("Error al eliminar el usuario", error);
+    console.error('Error al eliminar el usuario', error)
     res
       .status(500)
-      .json({ success: false, message: "Error interno del servidor" });
+      .json({ success: false, message: 'Error interno del servidor' })
   }
-};
+}
 
 module.exports = {
   getAllUsers,
@@ -142,5 +142,5 @@ module.exports = {
   registerUser,
   loginUser,
   updateUser,
-  deleteUser,
-};
+  deleteUser
+}
