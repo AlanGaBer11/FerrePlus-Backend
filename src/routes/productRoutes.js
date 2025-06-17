@@ -1,17 +1,31 @@
-const express = require('express')
-const router = express.Router()
-const productController = require('../controllers/productController')
-const validation = require('../validators/productValidator')
+const express = require("express");
+const router = express.Router();
+const productController = require("../controllers/productController");
+const validation = require("../validators/productValidator");
+const authentication = require("../middlewares/authMiddleware");
+const { checkRole } = require("../middlewares/rolMiddleware");
 
 router
-  .get('/getProducts', productController.getAllProducts)
-  .get('/getProduct/:id', productController.getProductById)
+  .get("/getProducts", authentication, productController.getAllProducts)
+  .get("/getProduct/:id", authentication, productController.getProductById)
   .post(
-    '/createProduct',
+    "/createProduct",
+    authentication,
+    checkRole(["ADMIN"]),
     validation.createProductValidator,
     productController.createProduct
   )
-  .patch('/updateProduct/:id', productController.updateProduct)
-  .delete('/deleteProduct/:id', productController.deleteProduct)
+  .patch(
+    "/updateProduct/:id",
+    authentication,
+    checkRole(["ADMIN"]),
+    productController.updateProduct
+  )
+  .delete(
+    "/deleteProduct/:id",
+    authentication,
+    checkRole(["ADMIN"]),
+    productController.deleteProduct
+  );
 
-module.exports = router
+module.exports = router;
