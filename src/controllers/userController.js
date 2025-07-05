@@ -98,11 +98,41 @@ const loginUser = async (req, res) => {
   }
 };
 
+const createUser = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    if (!name || !email || !password || !role) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Todos los campos son obligatorios" });
+    }
+    const newUser = await userService.createUser(name, email, password, role);
+    res.status(201).json({ success: true, message: "Usuario creado", newUser });
+  } catch (error) {
+    console.error("Error al registrar el usuario", error);
+
+    // Si es un error de email duplicado
+    if (error.message === "El email ya está registrado") {
+      return res.status(409).json({ success: false, message: error.message });
+    }
+
+    res
+      .status(500)
+      .json({ success: false, message: "Error Interno Del Servidor" });
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password } = req.body;
-    const updatedUser = await userService.updateUser(id, name, email, password);
+    const { name, email, password, role } = req.body;
+    const updatedUser = await userService.updateUser(
+      id,
+      name,
+      email,
+      password,
+      role
+    );
     if (!updatedUser) {
       return res
         .status(404)
@@ -141,6 +171,7 @@ module.exports = {
   getUserById,
   registerUser,
   loginUser,
+  createUser,
   updateUser,
   deleteUser,
 };

@@ -24,6 +24,13 @@ router
     userController.registerUser
   )
   .post("/login", validation.loginUserValidator, userController.loginUser)
+  .post(
+    "/createUser",
+    validation.newUserValidaror,
+    authentication,
+    checkRole(["ADMIN"]),
+    userController.createUser
+  )
   .patch("/updateUser/:id", authentication, userController.updateUser)
   .delete(
     "/deleteUser/:id",
