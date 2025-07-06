@@ -60,7 +60,7 @@ const updateSupplier = async (id, supplierData) => {
       [id]
     );
     if (supplierCheck.rows.length === 0) {
-      throw new Error("El usuario no existe");
+      throw new Error("El proveedor no existe");
     }
     const result = await db.query(
       "UPDATE suppliers SET  name = $1, phone = $2, address = $3, email = $4 WHERE id_supplier = $5 RETURNING*",
@@ -76,16 +76,22 @@ const updateSupplier = async (id, supplierData) => {
 // FUNCIÓN PARA ELIMIAR UN PROVEEDOR
 const deleteSupplier = async (id) => {
   try {
+    // Verificar si el proveedor existe
+    const supplierCheck = await db.query(
+      "SELECT * FROM suppliers WHERE id_supplier = $1",
+      [id]
+    );
+    if (supplierCheck.rows.length === 0) {
+      throw new Error("El proveedor no existe");
+    }
+    // SI EL PROVEEDOR EXISTE, SE ELIMINA
     const result = await db.query(
       "DELETE FROM suppliers WHERE id_supplier = $1 RETURNING *",
       [id]
     );
-    if (result.rows.length === 0) {
-      throw new Error("El proveedor no existe");
-    }
     return result.rows[0];
   } catch (err) {
-    console.error("Error al eliminar el provvedor:", err);
+    console.error("Error al eliminar el proveedor:", err);
     throw err;
   }
 };

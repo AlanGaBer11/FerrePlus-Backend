@@ -107,7 +107,6 @@ const createUser = async (userData) => {
 };
 
 // FUNCIÓN PARA ACTUALIZAR UN USUARIO (ACTUALIZA TODOS LOS CAMPOS)
-//! HACER QUE MANDE UN CODIGO DE VERIFICACIÓN AL CORREO PARA ACTUALIZAR LOS DATOS
 const updateUser = async (id, userData) => {
   const { name, email, password, role } = userData;
   try {
@@ -141,13 +140,17 @@ const updateUser = async (id, userData) => {
 // FUNCIÓN PARA ELIMINAR UN USUARIO
 const deleteUser = async (id) => {
   try {
+    // Verificar si el usuario existe
+    const userCheck = await db.query("SELECT * FROM users WHERE id_user = $1", [
+      id,
+    ]);
+    if (userCheck.rows.length === 0) {
+      throw new Error("El usuario no existe");
+    }
     const result = await db.query(
       "DELETE FROM users WHERE id_user = $1 RETURNING *",
       [id]
     );
-    if (result.rows.length === 0) {
-      throw new Error("El Usuario No Existe");
-    }
     return result.rows[0];
   } catch (err) {
     console.error("Error al eliminar el usuario:", err);

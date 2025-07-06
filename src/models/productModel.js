@@ -77,13 +77,19 @@ const updateProduct = async (id, productData) => {
 // FUNCIÓN PARA ELIMINAR UN PRODUCTO
 const deleteProduct = async (id) => {
   try {
+    // Verificar si el producto existe
+    const productCheck = await db.query(
+      "SELECT * FROM products WHERE id_product = $1",
+      [id]
+    );
+    if (productCheck.rows.length === 0) {
+      throw new Error("Producto no encontrado");
+    }
     const result = await db.query(
       "DELETE FROM products WHERE id_product = $1 RETURNING *",
       [id]
     );
-    if (result.rows.length === 0) {
-      throw new Error("El producto no existe");
-    }
+
     return result.rows[0];
   } catch (err) {
     console.error("Error al eliminar el producto:", err);
