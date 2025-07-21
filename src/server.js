@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+const sequelize = require("./config/db");
 
 // IMPORAR RUTAS
 const userRoute = require("./routes/userRoute");
@@ -11,11 +12,21 @@ const supplierRoute = require("./routes/supplierRoute");
 const productRoute = require("./routes/productRoutes");
 const movementRoute = require("./routes/movementRoute");
 
+// Sincronizar modelos con la base de datos
+sequelize
+  .sync({ alter: true }) // usar {force: true} solo en desarrollo
+  .then(() => {
+    console.log("Modelos sincronizados con la base de datos");
+  })
+  .catch((error) => {
+    console.error("Error al sincronizar modelos:", error);
+  });
+
 // CONFIGURACIÓN DE CORS
 const corsOptions = {
   origin: [
     "http://localhost:5173", // Frontend en desarrollo local
-    "https://crochet-craft-frontend.vercel.app", // Frontend en producción
+    "https://crochet-craft-frontend.vercel.app", // Frontend en producción //! Cambiar por el correcto
   ],
   credentials: true,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],

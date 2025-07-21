@@ -1,9 +1,9 @@
-const userService = require("../services/userService");
+const userProcess = require("../processes/userProcess");
 const jwt = require("jsonwebtoken");
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await userService.getAllUsers();
+    const users = await userProcess.getAllUsers();
     if (!users || users.length === 0) {
       return res
         .status(404)
@@ -22,7 +22,7 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    const user = await userService.getUserById(req.params.id);
+    const user = await userProcess.getUserById(req.params.id);
     if (!user) {
       return res
         .status(404)
@@ -45,7 +45,7 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
-    const newUser = await userService.registerUser(name, email, password);
+    const newUser = await userProcess.registerUser(name, email, password);
     res
       .status(201)
       .json({ success: true, message: "Usuario registrado", user: newUser });
@@ -71,7 +71,7 @@ const loginUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Email y Password son obligatorios" });
     }
-    const user = await userService.loginUser(email, password);
+    const user = await userProcess.loginUser(email, password);
     // Generar token
     const token = jwt.sign({ id: user.id_user }, process.env.JWT_SECRET, {
       expiresIn: "1h",
@@ -106,7 +106,7 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
-    const newUser = await userService.createUser(name, email, password, role);
+    const newUser = await userProcess.createUser(name, email, password, role);
     res.status(201).json({ success: true, message: "Usuario creado", newUser });
   } catch (error) {
     console.error("Error al registrar el usuario", error);
@@ -126,7 +126,7 @@ const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, password, role } = req.body;
-    const updatedUser = await userService.updateUser(
+    const updatedUser = await userProcess.updateUser(
       id,
       name,
       email,
@@ -151,7 +151,7 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const deletedUser = await userService.deleteUser(req.params.id);
+    const deletedUser = await userProcess.deleteUser(req.params.id);
     if (!deletedUser) {
       return res
         .status(404)

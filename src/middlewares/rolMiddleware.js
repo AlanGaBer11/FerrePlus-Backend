@@ -12,7 +12,7 @@ const checkRole = (roles) => {
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await UserModel.getUserById(decoded.id);
+      const user = await UserModel.findByPk(decoded.id);
 
       if (!user) {
         return res

@@ -1,61 +1,95 @@
-const supplierModel = require('../models/supplierModel')
+const Supplier = require("../models/supplierModel");
 
+// FUNCIÓN PARA OBTENER TODOS LOS PROVEEDORES
 const getAllSuppliers = async () => {
   try {
-    const suppliers = await supplierModel.getAllSuppliers()
-    return suppliers
-  } catch (err) {
-    console.error('Erro al obtener proveedores', err)
-    throw err
+    const suppliers = await Supplier.findAll({
+      order: [["id_supplier", "ASC"]],
+    });
+    return suppliers;
+  } catch (error) {
+    console.error("Error al obtener proveedores:", error);
+    throw error;
   }
-}
+};
 
+// FUNCIÓN PARA OBTENER UN PROVEEDOR POR ID
 const getSupplierById = async (id) => {
   try {
-    const supplier = await supplierModel.getSupplierById(id)
-    return supplier
-  } catch (err) {
-    console.error('Error al obtener proveedor', err)
-    throw err
+    const supplier = await Supplier.findByPk(id);
+    if (!supplier) {
+      throw new Error("Proveedor no encontrado");
+    }
+    return supplier;
+  } catch (error) {
+    console.error("Error al obtener el proveedor:", error);
+    throw error;
   }
-}
+};
 
-const createSupplier = async (name, phone, address, email) => {
+// FUNCIÓN PARA CREAR UN PROVEEDOR
+const createSupplier = async (supplierData) => {
+  const { name, phone, address, email } = supplierData;
   try {
-    const supplierData = { name, phone, address, email }
-    const newSupplier = await supplierModel.createSupplier(supplierData)
-    return newSupplier
-  } catch (err) {
-    console.error('Error al crear proveedor', err)
-    throw err
-  }
-}
+    // VERIFICAR SI EL PROVEEDOR YA EXISTE POR SU NOMBRE
+    const existingSupplier = await Supplier.findOne({
+      where: { name },
+    });
 
-const updateSupplier = async (id, name, phone, address, email) => {
+    if (existingSupplier) {
+      throw new Error("El proveedor ya está registrado");
+    }
+
+    const supplier = await Supplier.create({
+      name,
+      phone,
+      address,
+      email,
+    });
+
+    return supplier;
+  } catch (error) {
+    console.error("Error al crear un proveedor:", error);
+    throw error;
+  }
+};
+
+// FUNCIÓN PARA ACTUALIZAR UN PROVEEDOR
+const updateSupplier = async (id, supplierData) => {
   try {
-    const userData = { name, phone, address, email }
-    const updatedSupplier = await supplierModel.updateSupplier(id, userData)
-    return updatedSupplier
-  } catch (err) {
-    console.error('Error al actualizar proveedor:', err)
-    throw err
-  }
-}
+    const supplier = await Supplier.findByPk(id);
+    if (!supplier) {
+      throw new Error("El proveedor no existe");
+    }
 
+    await supplier.update(supplierData);
+    return supplier;
+  } catch (error) {
+    console.error("Error al actualizar el proveedor:", error);
+    throw error;
+  }
+};
+
+// FUNCIÓN PARA ELIMINAR UN PROVEEDOR
 const deleteSupplier = async (id) => {
   try {
-    const deleteSupplier = await supplierModel.deleteSupplier(id)
-    return deleteSupplier
-  } catch (err) {
-    console.error('Error al eliminar proveedor:', err)
-    throw err
+    const supplier = await Supplier.findByPk(id);
+    if (!supplier) {
+      throw new Error("El proveedor no existe");
+    }
+
+    await supplier.destroy();
+    return supplier;
+  } catch (error) {
+    console.error("Error al eliminar el proveedor:", error);
+    throw error;
   }
-}
+};
 
 module.exports = {
   getAllSuppliers,
   getSupplierById,
   createSupplier,
   updateSupplier,
-  deleteSupplier
-}
+  deleteSupplier,
+};

@@ -1,81 +1,121 @@
-const movementModel = require('../models/movementModel')
+const Movement = require("../models/movementModel");
+const Product = require("../models/productModel");
+const User = require("../models/userModel");
 
+// FUNCIÓN PARA OBTENER TODOS LOS MOVIMIENTOS
 const getAllMovements = async () => {
   try {
-    const movements = await movementModel.getAllMovements()
-    return movements
-  } catch (err) {
-    console.error('Error al obtener movimientos', err)
-    throw err
+    const movements = await Movement.findAll({
+      include: [
+        {
+          model: Product,
+          as: "product",
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: ["name"],
+        },
+      ],
+      order: [["id_movement", "ASC"]],
+    });
+    return movements;
+  } catch (error) {
+    console.error("Error al obtener movimientos:", error);
+    throw error;
   }
-}
+};
 
+// FUNCIÓN PARA OBTENER UN MOVIMIENTO POR ID
 const getMovementById = async (id) => {
   try {
-    const movement = await movementModel.getMovementById(id)
-    return movement
-  } catch (err) {
-    console.error('Error al obtener movimiento', err)
-    throw err
+    const movement = await Movement.findByPk(id, {
+      include: [
+        {
+          model: Product,
+          as: "product",
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          as: "user",
+          attributes: ["name"],
+        },
+      ],
+    });
+    if (!movement) {
+      throw new Error("Movimiento no encontrado");
+    }
+    return movement;
+  } catch (error) {
+    console.error("Error al obtener el movimiento:", error);
+    throw error;
   }
-}
+};
 
-const createMovement = async (
-  type,
-  quantity,
-  date,
-  comments,
-  id_product,
-  id_user
-) => {
-  const movementData = { type, quantity, date, comments, id_product, id_user }
-
+// FUNCIÓN PARA CREAR UN MOVIMIENTO
+const createMovement = async (movementData) => {
+  const { type, quantity, date, comments, id_product, id_user } = movementData;
   try {
-    const newMovement = await movementModel.createMovement(movementData)
-    return newMovement
-  } catch (err) {
-    console.error('Error al crear movimiento', err)
-    throw err
+    // Verificar si el producto existe
+    const product = await Product.findByPk(id_product);
+    if (!product) {
+      throw new Error("El producto no existe");
+    }
+
+    const movement = await Movement.create({
+      type,
+      quantity,
+      date,
+      comments,
+      id_product,
+      id_user,
+    });
+
+    return movement;
+  } catch (error) {
+    console.error("Error al crear movimiento:", error);
+    throw error;
   }
-}
+};
 
-const updateMovement = async (
-  id,
-  type,
-  quantity,
-  date,
-  comments,
-  id_product,
-  id_user
-) => {
-  const movementData = { type, quantity, date, comments, id_product, id_user }
-
+// FUNCIÓN PARA ACTUALIZAR UN MOVIMIENTO
+const updateMovement = async (id, movementData) => {
   try {
-    const updatedMovement = await movementModel.updateMovement(
-      id,
-      movementData
-    )
-    return updatedMovement
-  } catch (err) {
-    console.error('Error al actualizar movimiento', err)
-    throw err
-  }
-}
+    const movement = await Movement.findByPk(id);
+    if (!movement) {
+      throw new Error("El movimiento no existe");
+    }
 
+    await movement.update(movementData);
+    return movement;
+  } catch (error) {
+    console.error("Error al actualizar el movimiento:", error);
+    throw error;
+  }
+};
+
+// FUNCIÓN PARA ELIMINAR UN MOVIMIENTO
 const deleteMovement = async (id) => {
   try {
-    const deletedMovement = await movementModel.deleteMovement(id)
-    return deletedMovement
-  } catch (err) {
-    console.error('Error al eliminar movimiento', err)
-    throw err
+    const movement = await Movement.findByPk(id);
+    if (!movement) {
+      throw new Error("El movimiento no existe");
+    }
+
+    await movement.destroy();
+    return movement;
+  } catch (error) {
+    console.error("Error al eliminar el movimiento:", error);
+    throw error;
   }
-}
+};
 
 module.exports = {
   getAllMovements,
   getMovementById,
   createMovement,
   updateMovement,
-  deleteMovement
-}
+  deleteMovement,
+};

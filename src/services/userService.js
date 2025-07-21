@@ -1,75 +1,155 @@
-const userModel = require("../models/userModel");
+const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
 
+// FUNCIÓN PARA OBTENER TODOS LOS USUARIOS
 const getAllUsers = async () => {
   try {
-    const users = await userModel.getAllUsers();
+    const users = await User.findAll({
+      order: [["id_user", "ASC"]],
+    });
     return users;
-  } catch (err) {
-    console.error("Error al obtener usuarios:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al obtener usuarios:", error);
+    throw error;
   }
 };
 
+// FUNCIÓN PARA OBTENER UN USUARIO POR ID
 const getUserById = async (id) => {
   try {
-    const user = await userModel.getUserById(id);
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
     return user;
-  } catch (err) {
-    console.error("Error al obtener el usuario:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al obtener el usuario:", error);
+    throw error;
   }
 };
 
-const registerUser = async (name, email, password) => {
+// FUNCIÓN PARA REGISTRAR UN USUARIO
+const registerUser = async (userData) => {
+  const { name, email, password } = userData;
   try {
-    const userData = { name, email, password };
-    const newUser = await userModel.registerUser(userData);
-    return newUser;
-  } catch (err) {
-    console.error("Error al registrar usuario:", err);
-    throw err;
+    // VERIFICAR SI EL EMAIL YA EXISTE
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      throw new Error("El email ya está registrado");
+    }
+
+    // HASHEAMOS LA CONTRASEÑA
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // CREAR USUARIO
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error al registrar usuario:", error);
+    throw error;
   }
 };
 
+// FUNCIÓN PARA HACER LOGIN
 const loginUser = async (email, password) => {
   try {
-    const user = await userModel.loginUser(email, password);
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      throw new Error("El Usuario No Existe");
+    }
+
+    // Comparar la contraseña
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new Error("Contraseña Incorrecta");
+    }
+
     return user;
-  } catch (err) {
-    console.error("Error al iniciar sesión:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    throw error;
   }
 };
 
-const createUser = async (name, email, password, role) => {
+// FUNCIÓN PARA CREAR UN USUARIO
+const createUser = async (userData) => {
+  const { name, email, password, role } = userData;
   try {
-    const userData = { name, email, password, role };
-    const newUser = await userModel.createUser(userData);
-    return newUser;
-  } catch (err) {
-    console.error("Error al crear el usuario", err);
-    throw err;
+    // VERIFICAR SI EL EMAIL YA EXISTE
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      throw new Error("El email ya está registrado");
+    }
+
+    // HASHEAMOS LA CONTRASEÑA
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // CREAR USUARIO
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error al crear usuario:", error);
+    throw error;
   }
 };
 
-const updateUser = async (id, name, email, password, role) => {
+// FUNCIÓN PARA ACTUALIZAR UN USUARIO
+const updateUser = async (id, userData) => {
+  const { name, email, password, role } = userData;
   try {
-    const userData = { name, email, password, role };
-    const updatedUser = await userModel.updateUser(id, userData);
-    return updatedUser;
-  } catch (err) {
-    console.error("Error al actualizar usuario:", err);
-    throw err;
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new Error("El usuario no existe");
+    }
+
+    // Hashear la nueva contraseña si se proporciona
+    let hashedPassword;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
+
+    // Actualizar usuario
+    await User.update({
+      name,
+      email,
+      password: hashedPassword || user.password,
+      role,
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error al actualizar el usuario:", error);
+    throw error;
   }
 };
 
+// FUNCIÓN PARA ELIMINAR UN USUARIO
 const deleteUser = async (id) => {
   try {
-    const deletedUser = await userModel.deleteUser(id);
-    return deletedUser;
-  } catch (err) {
-    console.error("Error al eliminar usuario:", err);
-    throw err;
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new Error("El usuario no existe");
+    }
+
+    await User.destroy();
+    return user;
+  } catch (error) {
+    console.error("Error al eliminar el usuario:", error);
+    throw error;
   }
 };
 
