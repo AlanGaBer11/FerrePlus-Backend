@@ -28,6 +28,7 @@ const Product = sequelize.define(
     },
     id_supplier: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: Supplier,
         key: "id_supplier",

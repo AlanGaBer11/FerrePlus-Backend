@@ -6,16 +6,17 @@ const User = require("../models/userModel");
 const getAllMovements = async () => {
   try {
     const movements = await Movement.findAll({
+      attributes: ["id_movement", "type", "quantity", "date", "comments"],
       include: [
         {
           model: Product,
           as: "product",
-          attributes: ["name"],
+          attributes: ["id_product", "name"],
         },
         {
           model: User,
           as: "user",
-          attributes: ["name"],
+          attributes: ["id_user", "name", "email"],
         },
       ],
       order: [["id_movement", "ASC"]],
@@ -31,16 +32,18 @@ const getAllMovements = async () => {
 const getMovementById = async (id) => {
   try {
     const movement = await Movement.findByPk(id, {
+      attributes: ["id_movement", "type", "quantity", "date", "comments"],
+
       include: [
         {
           model: Product,
           as: "product",
-          attributes: ["name"],
+          attributes: ["id_product", "name"],
         },
         {
           model: User,
           as: "user",
-          attributes: ["name"],
+          attributes: ["id_user", "name", "email"],
         },
       ],
     });

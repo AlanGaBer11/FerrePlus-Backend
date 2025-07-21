@@ -5,11 +5,12 @@ const Supplier = require("../models/supplierModel");
 const getAllProducts = async () => {
   try {
     const products = await Product.findAll({
+      attributes: ["id_product", "name", "category", "price", "stock"], // Especificamos los atributos
       include: [
         {
           model: Supplier,
           as: "supplier",
-          attributes: ["name"],
+          attributes: ["id_supplier", "name"],
         },
       ],
       order: [["id_product", "ASC"]],
@@ -25,11 +26,12 @@ const getAllProducts = async () => {
 const getProductById = async (id) => {
   try {
     const product = await Product.findByPk(id, {
+      attributes: ["id_product", "name", "category", "price", "stock"], // Especificamos los atributos a mostrar
       include: [
         {
           model: Supplier,
           as: "supplier",
-          attributes: ["name"],
+          attributes: ["id_supplier", "name"],
         },
       ],
     });
