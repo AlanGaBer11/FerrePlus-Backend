@@ -123,7 +123,7 @@ const updateUser = async (id, userData) => {
     }
 
     // Actualizar usuario
-    await User.update({
+    await user.update({
       name,
       email,
       password: hashedPassword || user.password,
@@ -145,7 +145,7 @@ const deleteUser = async (id) => {
       throw new Error("El usuario no existe");
     }
 
-    await User.destroy();
+    await user.destroy();
     return user;
   } catch (error) {
     console.error("Error al eliminar el usuario:", error);
