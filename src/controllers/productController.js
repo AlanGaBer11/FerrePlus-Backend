@@ -40,22 +40,22 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, category, price, stock, id_supplier } = req.body;
-    if (!name || !category || !price || !stock || !id_supplier) {
+    const { name, category, price, stock, supplier_name } = req.body;
+    if (!name || !category || !price || !stock || !supplier_name) {
       return res
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
-    const newProduct = await productProcess.createProduct(
+    const newProduct = await productProcess.createProduct({
       name,
       category,
       price,
       stock,
-      id_supplier
-    );
+      supplier_name,
+    });
     res
       .status(201)
-      .json({ success: true, message: "Producto creado", newProduct }); //
+      .json({ success: true, message: "Producto creado", newProduct });
   } catch (err) {
     console.error("Error al crear el producto", err);
     res
@@ -66,20 +66,19 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const { name, category, price, stock, id_supplier } = req.body;
-    if (!name || !category || !price || !stock || !id_supplier) {
+    const { name, category, price, stock, supplier_name } = req.body;
+    if (!name || !category || !price || !stock) {
       return res
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
-    const updatedProduct = await productProcess.updateProduct(
-      req.params.id,
+    const updatedProduct = await productProcess.updateProduct(req.params.id, {
       name,
       category,
       price,
       stock,
-      id_supplier
-    );
+      supplier_name,
+    });
     res.status(200).json({
       success: true,
       message: "Producto actualizado",

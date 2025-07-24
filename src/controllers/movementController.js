@@ -40,20 +40,28 @@ const getMovementById = async (req, res) => {
 
 const createMovement = async (req, res) => {
   try {
-    const { type, quantity, date, comments, id_product, id_user } = req.body;
-    if (!type || !quantity || !date || !comments || !id_product || !id_user) {
+    const { type, quantity, date, comments, product_name, user_name } =
+      req.body;
+    if (
+      !type ||
+      !quantity ||
+      !date ||
+      !comments ||
+      !product_name ||
+      !user_name
+    ) {
       return res
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
-    const newMovement = await movementProcess.createMovement(
+    const newMovement = await movementProcess.createMovement({
       type,
       quantity,
       date,
       comments,
-      id_product,
-      id_user
-    );
+      product_name,
+      user_name,
+    });
     res
       .status(201)
       .json({ success: true, message: "Movimiento creado", newMovement });
@@ -67,20 +75,30 @@ const createMovement = async (req, res) => {
 
 const updateMovement = async (req, res) => {
   try {
-    const { type, quantity, date, comments, id_product, id_user } = req.body;
-    if (!type || !quantity || !date || !comments || !id_product || !id_user) {
+    const { type, quantity, date, comments, product_name, user_name } =
+      req.body;
+    if (
+      !type ||
+      !quantity ||
+      !date ||
+      !comments ||
+      !product_name ||
+      !user_name
+    ) {
       return res
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
     const updatedMovement = await movementProcess.updateMovement(
       req.params.id,
-      type,
-      quantity,
-      date,
-      comments,
-      id_product,
-      id_user
+      {
+        type,
+        quantity,
+        date,
+        comments,
+        product_name,
+        user_name,
+      }
     );
     res.status(200).json({
       success: true,

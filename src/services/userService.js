@@ -57,8 +57,9 @@ const registerUser = async (userData) => {
 };
 
 // FUNCIÓN PARA HACER LOGIN
-const loginUser = async (email, password) => {
+const loginUser = async (credentials) => {
   try {
+    const { email, password } = credentials;
     const user = await User.findOne({ where: { email } });
     if (!user) {
       throw new Error("El Usuario No Existe");

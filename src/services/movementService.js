@@ -59,12 +59,19 @@ const getMovementById = async (id) => {
 
 // FUNCIÓN PARA CREAR UN MOVIMIENTO
 const createMovement = async (movementData) => {
-  const { type, quantity, date, comments, id_product, id_user } = movementData;
+  const { type, quantity, date, comments, product_name, user_name } =
+    movementData;
   try {
-    // Verificar si el producto existe
-    const product = await Product.findByPk(id_product);
+    // Buscar el producto por su nombre
+    const product = await Product.findOne({ where: { name: product_name } });
     if (!product) {
-      throw new Error("El producto no existe");
+      throw new Error("Producto no encontrado");
+    }
+
+    // Buscar el usuario por su nombre
+    const user = await User.findOne({ where: { name: user_name } });
+    if (!user) {
+      throw new Error("Usuario no encontrado");
     }
 
     const movement = await Movement.create({
@@ -72,8 +79,8 @@ const createMovement = async (movementData) => {
       quantity,
       date,
       comments,
-      id_product,
-      id_user,
+      id_product: product.id_product,
+      id_user: user.id_user,
     });
 
     return movement;
@@ -85,13 +92,44 @@ const createMovement = async (movementData) => {
 
 // FUNCIÓN PARA ACTUALIZAR UN MOVIMIENTO
 const updateMovement = async (id, movementData) => {
+  const { type, quantity, date, comments, product_name, user_name } =
+    movementData;
   try {
     const movement = await Movement.findByPk(id);
     if (!movement) {
       throw new Error("El movimiento no existe");
     }
+    // Buscar el producto por nombre si se proporciona
+    let id_product;
+    if (product_name) {
+      const product = await Product.findOne({
+        where: { name: product_name },
+      });
+      if (!product) {
+        throw new Error("Producto no encontrado");
+      }
+      id_product = product.id_product;
+    }
 
-    await movement.update(movementData);
+    // Buscar el usuario por nombre si se proporciona
+    let id_user;
+    if (user_name) {
+      const user = await User.findOne({ where: { name: user_name } });
+      if (!user) {
+        throw new Error("Usuario no encontrado");
+      }
+      id_user = user.id_user;
+    }
+
+    await movement.update({
+      type,
+      quantity,
+      date,
+      comments,
+      id_product: id_product || movement.id_product,
+      id_user: id_user || movement.id_user,
+    });
+
     return movement;
   } catch (error) {
     console.error("Error al actualizar el movimiento:", error);

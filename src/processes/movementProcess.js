@@ -20,17 +20,9 @@ const getMovementById = async (id) => {
   }
 };
 
-const createMovement = async (
-  type,
-  quantity,
-  date,
-  comments,
-  id_product,
-  id_user
-) => {
-  const movementData = { type, quantity, date, comments, id_product, id_user };
-
+const createMovement = async (movementData) => {
   try {
+    // const movementData = { type, quantity, date, comments, product_name, user_name };
     const newMovement = await movementService.createMovement(movementData);
     return newMovement;
   } catch (err) {
@@ -39,18 +31,9 @@ const createMovement = async (
   }
 };
 
-const updateMovement = async (
-  id,
-  type,
-  quantity,
-  date,
-  comments,
-  id_product,
-  id_user
-) => {
-  const movementData = { type, quantity, date, comments, id_product, id_user };
-
+const updateMovement = async (id, movementData) => {
   try {
+    // const movementData = { type, quantity, date, comments, id_product, id_user };
     const updatedMovement = await movementService.updateMovement(
       id,
       movementData

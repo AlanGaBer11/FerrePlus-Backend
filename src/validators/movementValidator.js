@@ -1,47 +1,49 @@
-const { check, validationResult } = require('express-validator')
+const { check, validationResult } = require("express-validator");
 
 const createMovementValidator = [
-  check('type')
+  check("type")
     .notEmpty()
-    .withMessage('El tipo de movimiento es obligatorio')
-    .isIn(['Entrada', 'Salida'])
+    .withMessage("El tipo de movimiento es obligatorio")
+    .isIn(["Entrada", "Salida"])
     .withMessage('El tipo de movimiento debe ser "Entrada" o "Salida"'),
 
-  check('quantity')
+  check("quantity")
     .notEmpty()
-    .withMessage('La cantidad es obligatorio')
+    .withMessage("La cantidad es obligatorio")
     .isLength({ min: 1 })
-    .withMessage('La cantidad debe tener al menos 1 caracter')
+    .withMessage("La cantidad debe tener al menos 1 caracter")
     .isInt({ min: 1 })
-    .withMessage('La cantidad debe ser un número entero positivo'),
+    .withMessage("La cantidad debe ser un número entero positivo"),
 
-  check('date')
+  check("date")
     .notEmpty()
-    .withMessage('La fecha es obligatoria')
+    .withMessage("La fecha es obligatoria")
     .isISO8601()
-    .withMessage('La fecha debe estar en formato ISO 8601 (YYYY-MM-DD)'),
+    .withMessage("La fecha debe estar en formato ISO 8601 (YYYY-MM-DD)"),
 
-  check('comments')
+  check("comments")
     .notEmpty()
-    .withMessage('Los comentarios son obligatorios')
+    .withMessage("Los comentarios son obligatorios")
     .isLength({ min: 10 })
-    .withMessage('Los comentarios deben tener al menos 10 caracteres')
+    .withMessage("Los comentarios deben tener al menos 10 caracteres")
     .isString()
-    .withMessage('Los comentarios deben ser una cadena de texto'),
+    .withMessage("Los comentarios deben ser una cadena de texto"),
 
-  check('id_product')
+  check("product_name")
     .notEmpty()
-    .withMessage('El id del producto es obligatorio'),
+    .withMessage("El nombre del producto es obligatorio"),
 
-  check('id_user').notEmpty().withMessage('El id del usuario es obligatorio'),
+  check("user_name")
+    .notEmpty()
+    .withMessage("El nombre del usuario es obligatorio"),
 
   (req, res, next) => {
-    const errors = validationResult(req)
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() })
+      return res.status(400).json({ success: false, errors: errors.array() });
     }
-    next()
-  }
-]
+    next();
+  },
+];
 
-module.exports = { createMovementValidator }
+module.exports = { createMovementValidator };

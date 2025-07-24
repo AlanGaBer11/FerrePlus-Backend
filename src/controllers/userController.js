@@ -45,7 +45,7 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
-    const newUser = await userProcess.registerUser(name, email, password);
+    const newUser = await userProcess.registerUser({ name, email, password });
     res
       .status(201)
       .json({ success: true, message: "Usuario registrado", user: newUser });
@@ -71,7 +71,7 @@ const loginUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Email y Password son obligatorios" });
     }
-    const user = await userProcess.loginUser(email, password);
+    const user = await userProcess.loginUser({ email, password });
     // Generar token
     const token = jwt.sign({ id: user.id_user }, process.env.JWT_SECRET, {
       expiresIn: "1h",
@@ -106,7 +106,12 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Todos los campos son obligatorios" });
     }
-    const newUser = await userProcess.createUser(name, email, password, role);
+    const newUser = await userProcess.createUser({
+      name,
+      email,
+      password,
+      role,
+    });
     res.status(201).json({ success: true, message: "Usuario creado", newUser });
   } catch (error) {
     console.error("Error al registrar el usuario", error);
@@ -124,15 +129,13 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { id } = req.params;
     const { name, email, password, role } = req.body;
-    const updatedUser = await userProcess.updateUser(
-      id,
+    const updatedUser = await userProcess.updateUser(req.params.id, {
       name,
       email,
       password,
-      role
-    );
+      role,
+    });
     if (!updatedUser) {
       return res
         .status(404)

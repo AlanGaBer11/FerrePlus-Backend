@@ -46,12 +46,12 @@ const createSupplier = async (req, res) => {
         .status(400)
         .json({ succes: false, message: "Todos los campos son obligatorios" });
     }
-    const newSupplier = await supplierProcess.createSupplier(
+    const newSupplier = await supplierProcess.createSupplier({
       name,
       phone,
       address,
-      email
-    );
+      email,
+    });
     res
       .status(201)
       .json({ succes: true, message: "Proveedor creado", newSupplier });
@@ -70,14 +70,15 @@ const createSupplier = async (req, res) => {
 
 const updatedSupplier = async (req, res) => {
   try {
-    const { id } = req.params;
     const { name, phone, address, email } = req.body;
     const updatedSupplier = await supplierProcess.updateSupplier(
-      id,
-      name,
-      phone,
-      address,
-      email
+      req.params.id,
+      {
+        name,
+        phone,
+        address,
+        email,
+      }
     );
     if (!updatedSupplier) {
       return res

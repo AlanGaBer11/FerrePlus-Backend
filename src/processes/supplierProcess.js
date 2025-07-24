@@ -20,9 +20,9 @@ const getSupplierById = async (id) => {
   }
 };
 
-const createSupplier = async (name, phone, address, email) => {
+const createSupplier = async (supplierData) => {
   try {
-    const supplierData = { name, phone, address, email };
+    // const supplierData = { name, phone, address, email };
     const newSupplier = await supplierService.createSupplier(supplierData);
     return newSupplier;
   } catch (err) {
@@ -31,10 +31,13 @@ const createSupplier = async (name, phone, address, email) => {
   }
 };
 
-const updateSupplier = async (id, name, phone, address, email) => {
+const updateSupplier = async (id, supplierData) => {
   try {
-    const userData = { name, phone, address, email };
-    const updatedSupplier = await supplierService.updateSupplier(id, userData);
+    // const supplierData = { name, phone, address, email };
+    const updatedSupplier = await supplierService.updateSupplier(
+      id,
+      supplierData
+    );
     return updatedSupplier;
   } catch (err) {
     console.error("Error al actualizar proveedor:", err);

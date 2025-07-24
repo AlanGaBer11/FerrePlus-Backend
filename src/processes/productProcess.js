@@ -20,9 +20,9 @@ const getProductById = async (id) => {
   }
 };
 
-const createProduct = async (name, category, price, stock, id_supplier) => {
+const createProduct = async (productData) => {
   try {
-    const productData = { name, category, price, stock, id_supplier };
+    // const productData = { name, category, price, stock, supplier_name };
     const newProduct = await productService.createProduct(productData);
     return newProduct;
   } catch (err) {
@@ -31,9 +31,8 @@ const createProduct = async (name, category, price, stock, id_supplier) => {
   }
 };
 
-const updateProduct = async (id, name, category, price, stock, id_supplier) => {
+const updateProduct = async (id, productData) => {
   try {
-    const productData = { name, category, price, stock, id_supplier, id };
     const updatedProduct = await productService.updateProduct(id, productData);
     return updatedProduct;
   } catch (err) {

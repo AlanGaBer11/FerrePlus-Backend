@@ -47,7 +47,7 @@ const getProductById = async (id) => {
 
 // FUNCIÓN PARA CREAR UN PRODUCTO
 const createProduct = async (productData) => {
-  const { name, category, price, stock, id_supplier } = productData;
+  const { name, category, price, stock, supplier_name } = productData;
   try {
     // Verificar si el producto ya existe
     const existingProduct = await Product.findOne({ where: { name } });
@@ -55,12 +55,18 @@ const createProduct = async (productData) => {
       throw new Error("El producto ya está registrado");
     }
 
+    // Buscar el proveedor por nombre
+    const supplier = await Supplier.findOne({ where: { name: supplier_name } });
+    if (!supplier) {
+      throw new Error("Proveedor no encontrado");
+    }
+
     const product = await Product.create({
       name,
       category,
       price,
       stock,
-      id_supplier,
+      id_supplier: supplier.id_supplier, // Usamos el ID del proveedor encontrado
     });
 
     return product;
@@ -72,13 +78,34 @@ const createProduct = async (productData) => {
 
 // FUNCIÓN PARA ACTUALIZAR UN PRODUCTO
 const updateProduct = async (id, productData) => {
+  const { name, category, price, stock, supplier_name } = productData;
   try {
     const product = await Product.findByPk(id);
     if (!product) {
       throw new Error("El producto no existe");
     }
 
-    await product.update(productData);
+    // Buscar el proveedor por nombre si se proporciona
+    let id_supplier;
+    if (supplier_name) {
+      const supplier = await Supplier.findOne({
+        where: { name: supplier_name },
+      });
+      if (!supplier) {
+        throw new Error("Proveedor no encontrado");
+      }
+      id_supplier = supplier.id_supplier;
+    }
+
+    // Actualizar el producto con el id_supplier encontrado
+    await product.update({
+      name,
+      category,
+      price,
+      stock,
+      id_supplier: id_supplier || product.id_supplier,
+    });
+
     return product;
   } catch (error) {
     console.error("Error al actualizar el producto:", error);

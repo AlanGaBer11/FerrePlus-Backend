@@ -20,9 +20,9 @@ const getUserById = async (id) => {
   }
 };
 
-const registerUser = async (name, email, password) => {
+const registerUser = async (userData) => {
   try {
-    const userData = { name, email, password };
+    // const userData = { name, email, password };
     const newUser = await userService.registerUser(userData);
     return newUser;
   } catch (err) {
@@ -31,9 +31,9 @@ const registerUser = async (name, email, password) => {
   }
 };
 
-const loginUser = async (email, password) => {
+const loginUser = async (credentials) => {
   try {
-    const user = await userService.loginUser(email, password);
+    const user = await userService.loginUser(credentials);
     return user;
   } catch (err) {
     console.error("Error al iniciar sesión:", err);
@@ -41,9 +41,9 @@ const loginUser = async (email, password) => {
   }
 };
 
-const createUser = async (name, email, password, role) => {
+const createUser = async (userData) => {
   try {
-    const userData = { name, email, password, role };
+    // const userData = { name, email, password, role };
     const newUser = await userService.createUser(userData);
     return newUser;
   } catch (err) {
@@ -52,9 +52,9 @@ const createUser = async (name, email, password, role) => {
   }
 };
 
-const updateUser = async (id, name, email, password, role) => {
+const updateUser = async (id, userData) => {
   try {
-    const userData = { name, email, password, role };
+    // const userData = { name, email, password, role };
     const updatedUser = await userService.updateUser(id, userData);
     return updatedUser;
   } catch (err) {
