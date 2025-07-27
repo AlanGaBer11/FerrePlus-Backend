@@ -1,8 +1,8 @@
 const supplierService = require("..//services/supplierService");
 
-const getAllSuppliers = async () => {
+const getAllSuppliers = async (page, limit) => {
   try {
-    const suppliers = await supplierService.getAllSuppliers();
+    const suppliers = await supplierService.getAllSuppliers(page, limit);
     return suppliers;
   } catch (err) {
     console.error("Erro al obtener proveedores", err);

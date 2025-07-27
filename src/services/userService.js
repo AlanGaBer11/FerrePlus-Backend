@@ -1,13 +1,29 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 
-// FUNCIÓN PARA OBTENER TODOS LOS USUARIOS
-const getAllUsers = async () => {
+// FUNCIÓN PARA OBTENER TODOS LOS USUARIOS (CON PAGINACIÓN)
+const getAllUsers = async (page, limit) => {
   try {
-    const users = await User.findAll({
+    // Calcular el offset
+    const offset = (page - 1) * limit;
+
+    // Obtener usuarios con count y rows
+    const { count, rows } = await User.findAndCountAll({
+      limit: limit,
+      offset: offset,
       order: [["id_user", "ASC"]],
+      attributes: { exclude: ["password"] }, // Excluir la contraseña de los resultados
     });
-    return users;
+
+    // Calcular el total de páginas
+    const totalPages = Math.ceil(count / limit);
+
+    return {
+      users: rows,
+      totalUsers: count,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
     throw error;

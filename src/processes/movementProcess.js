@@ -1,8 +1,8 @@
 const movementService = require("../services/movementService");
 
-const getAllMovements = async () => {
+const getAllMovements = async (page, limit) => {
   try {
-    const movements = await movementService.getAllMovements();
+    const movements = await movementService.getAllMovements(page, limit);
     return movements;
   } catch (err) {
     console.error("Error al obtener movimientos", err);

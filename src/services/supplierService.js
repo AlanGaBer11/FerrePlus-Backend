@@ -1,12 +1,28 @@
 const Supplier = require("../models/supplierModel");
 
-// FUNCIÓN PARA OBTENER TODOS LOS PROVEEDORES
-const getAllSuppliers = async () => {
+// FUNCIÓN PARA OBTENER TODOS LOS PROVEEDORES (CON PAGINACIÓN)
+const getAllSuppliers = async (page, limit) => {
   try {
-    const suppliers = await Supplier.findAll({
+    // Calcular el offset
+    const offset = (page - 1) * limit;
+
+    // Obtener proveedores con count y rows
+
+    const { count, rows } = await Supplier.findAndCountAll({
+      limit: limit,
+      offset: offset,
       order: [["id_supplier", "ASC"]],
     });
-    return suppliers;
+
+    // Calcula el total de páginas
+    const totalPages = Math.ceil(count / limit);
+
+    return {
+      suppliers: rows,
+      totalSuppliers: count,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   } catch (error) {
     console.error("Error al obtener proveedores:", error);
     throw error;

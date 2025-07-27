@@ -2,15 +2,45 @@ const productProcess = require("../processes/productProcess");
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await productProcess.getAllProducts();
-    if (!products || products.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "No hay productos" });
+    // Obtener los parámetros de paginación
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Validar que los valores sean positivos
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Los parámetros page y limit deben ser números positivos",
+      });
     }
-    res
-      .status(200)
-      .json({ success: false, message: "Productos obtenidos", products });
+
+    // Limitar el máximo de elementos por página
+    const maxLimit = 100;
+    const finalLimit = limit > maxLimit ? maxLimit : limit;
+
+    // Obtener productos con paginación
+    const result = await productProcess.getAllProducts(page, finalLimit);
+
+    if (!result.products || result.products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No hay productos en esta página",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Productos obtenidos",
+      products: result.products,
+      pagination: {
+        currentPage: page,
+        totalPages: result.totalPages,
+        totalProducts: result.totalProducts,
+        productsPerPage: finalLimit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
   } catch (err) {
     console.error("Error al obtener los productos", err);
     res

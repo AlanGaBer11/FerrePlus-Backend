@@ -2,10 +2,16 @@ const Movement = require("../models/movementModel");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
 
-// FUNCIÓN PARA OBTENER TODOS LOS MOVIMIENTOS
-const getAllMovements = async () => {
+// FUNCIÓN PARA OBTENER TODOS LOS MOVIMIENTOS (CON PAGINACIÓN)
+const getAllMovements = async (page, limit) => {
   try {
-    const movements = await Movement.findAll({
+    // Calcular el offset
+    const offset = (page - 1) * limit;
+
+    // Obtener movimientos con count y rows
+    const { count, rows } = await Movement.findAndCountAll({
+      limit: limit,
+      offset: offset,
       attributes: ["id_movement", "type", "quantity", "date", "comments"],
       include: [
         {
@@ -21,7 +27,16 @@ const getAllMovements = async () => {
       ],
       order: [["id_movement", "ASC"]],
     });
-    return movements;
+
+    // Calcular el total de página
+    const totalPages = Math.ceil(count / limit);
+
+    return {
+      movements: rows,
+      totalMovements: count,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   } catch (error) {
     console.error("Error al obtener movimientos:", error);
     throw error;

@@ -3,20 +3,51 @@ const jwt = require("jsonwebtoken");
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await userProcess.getAllUsers();
-    if (!users || users.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "No hay usuarios" });
+    // Obtener parámetros de paginación de la query string
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Validar que los valores sean positivos
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Los parámetros page y limit deben ser números positivos",
+      });
     }
-    res
-      .status(200)
-      .json({ success: true, message: "Usuarios obtenidos", users });
+
+    // Limitar el máximo de elementos por página
+    const maxLimit = 100;
+    const finalLimit = limit > maxLimit ? maxLimit : limit;
+
+    // Obtener usuarios con paginación
+    const result = await userProcess.getAllUsers(page, finalLimit);
+
+    if (!result.users || result.users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No hay usuarios en esta página",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Usuarios obtenidos",
+      users: result.users,
+      pagination: {
+        currentPage: page,
+        totalPages: result.totalPages,
+        totalUsers: result.totalUsers,
+        usersPerPage: finalLimit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
   } catch (error) {
     console.error("Error al obtener los usuarios", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error interno del servidor" });
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
   }
 };
 

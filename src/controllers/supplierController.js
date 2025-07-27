@@ -2,15 +2,44 @@ const supplierProcess = require("../processes/supplierProcess");
 
 const getAllSuppliers = async (req, res) => {
   try {
-    const suppliers = await supplierProcess.getAllSuppliers();
-    if (!suppliers || suppliers === 0) {
+    // Obtener parámetros de paginación
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Validar que los valores sean positivos
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        succes: false,
+        message: "Los parámetros page y limit deben se números positivos",
+      });
+    }
+
+    // Limitar el máximo de elementos por pagina
+    const maxLimit = 100;
+    const finalLimit = limit > maxLimit ? maxLimit : limit;
+
+    // Obtener proveedores
+    const result = await supplierProcess.getAllSuppliers(page, finalLimit);
+
+    if (!result.suppliers || result.suppliers.length === 0) {
       return res
         .status(404)
-        .json({ succes: false, message: "No hay proveedores" });
+        .json({ succes: false, message: "No hay proveedores en esta página" });
     }
-    res
-      .status(200)
-      .json({ succes: true, message: "Proveedores obtenidos", suppliers });
+
+    res.status(200).json({
+      success: true,
+      message: "Proveedores obtenidos",
+      suppliers: result.suppliers,
+      pagination: {
+        currentPage: page,
+        totalPages: result.totalPages,
+        totalSuppliers: result.totalSuppliers,
+        supplierPerPage: finalLimit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
   } catch (err) {
     console.error("Error al obtener los proveedores", err);
     res

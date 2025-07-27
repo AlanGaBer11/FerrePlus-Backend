@@ -2,15 +2,43 @@ const movementProcess = require("../processes/movementProcess");
 
 const getAllMovements = async (req, res) => {
   try {
-    const movements = await movementProcess.getAllMovements();
-    if (!movements || movements.length === 0) {
+    // Obtener parámetros de paginación
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Validar que los valores seean positivos
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Los parámetros page y limit deben ser números positivos",
+      });
+    }
+
+    // Limitar el máximo de elementos por página
+    const maxLimit = 100;
+    const finalLimit = limit > maxLimit ? maxLimit : limit;
+
+    // Obtener movimientos con paginación
+    const result = await movementProcess.getAllMovements(page, finalLimit);
+    if (!result.movements || result.movements.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "No hay movimientos" });
+        .json({ success: false, message: "No hay movimientos en está página" });
     }
-    res
-      .status(200)
-      .json({ success: true, message: "Movimientos obtenios", movements });
+
+    res.status(200).json({
+      success: true,
+      message: "Movimientos obtenidos",
+      movements: result.movements,
+      pagination: {
+        currentPage: page,
+        totalPages: result.totalPages,
+        totalMovements: result.totalMovements,
+        movementsPerPage: finalLimit,
+        hasNextPage: page < result.totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
   } catch (err) {
     console.error("Error al obtener movimientos", err);
     res

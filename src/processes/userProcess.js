@@ -1,8 +1,8 @@
 const userService = require("../services/userService");
 
-const getAllUsers = async () => {
+const getAllUsers = async (page, limit) => {
   try {
-    const users = await userService.getAllUsers();
+    const users = await userService.getAllUsers(page, limit);
     return users;
   } catch (err) {
     console.error("Error al obtener usuarios:", err);

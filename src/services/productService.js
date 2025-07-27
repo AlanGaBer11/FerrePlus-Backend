@@ -1,10 +1,16 @@
 const Product = require("../models/productModel");
 const Supplier = require("../models/supplierModel");
 
-// FUNCIÓN PARA OBTENER TODOS LOS PRODUCTOS
-const getAllProducts = async () => {
+// FUNCIÓN PARA OBTENER TODOS LOS PRODUCTOS (CON PAGINACIÓN)
+const getAllProducts = async (page, limit) => {
   try {
-    const products = await Product.findAll({
+    // Calcular el offset
+    const offset = (page - 1) * limit;
+
+    // Obtener productos con count y rows
+    const { count, rows } = await Product.findAndCountAll({
+      limit: limit,
+      offset: offset,
       attributes: ["id_product", "name", "category", "price", "stock"], // Especificamos los atributos
       include: [
         {
@@ -15,7 +21,16 @@ const getAllProducts = async () => {
       ],
       order: [["id_product", "ASC"]],
     });
-    return products;
+
+    // Calcular el total de páginas
+    const totalPages = Math.ceil(count / limit);
+
+    return {
+      products: rows,
+      totalProducts: count,
+      totalPages: totalPages,
+      currentPage: page,
+    };
   } catch (error) {
     console.error("Error al obtener productos:", error);
     throw error;
