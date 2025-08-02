@@ -4,35 +4,21 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
-const sequelize = require("./config/db");
+const sequelize = require("./shared/config/db");
+const corsOptions = require("./shared/config/cors");
 
-// IMPORAR RUTAS
-const userRoute = require("./routes/userRoute");
-const supplierRoute = require("./routes/supplierRoute");
-const productRoute = require("./routes/productRoutes");
-const movementRoute = require("./routes/movementRoute");
+// IMPORTAR RUTAS PRINCIPALES
+const routes = require("./routes/index");
 
 // Sincronizar modelos con la base de datos
 sequelize
   .sync({ alter: true }) // usar {force: true} solo en desarrollo
   .then(() => {
-    console.log("Modelos sincronizados con la base de datos");
+    console.log("✅ Modelos sincronizados con la base de datos");
   })
   .catch((error) => {
-    console.error("Error al sincronizar modelos:", error);
+    console.error("❌ Error al sincronizar modelos:", error);
   });
-
-// CONFIGURACIÓN DE CORS
-const corsOptions = {
-  origin: [
-    "http://localhost:5173", // Frontend en desarrollo local
-    "https://crochet-craft-frontend.vercel.app", // Frontend en producción //! Cambiar por el correcto
-  ],
-  credentials: true,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
-};
 
 // INICIALIZAR LA APLICACIÓN
 const app = express();
@@ -49,7 +35,7 @@ const limiter = rateLimit({
   message: "¡Demasiadas peticiones!",
   standardHeaders: true,
   handler: (req, res) => {
-    console.log("IP Bloqueada, alcanzo el límite de peticiones");
+    console.log("⚠️ IP Bloqueada, alcanzó el límite de peticiones");
     res.status(409).json({ error: "Demasiadas peticiones!" });
   },
 });
@@ -64,21 +50,22 @@ app.use(bodyParser.json());
 
 // RUTA DE BIENVENIDA
 app.get("/", (req, res) => {
-  res.send("Bienvenido a FerrePlus");
+  res.send("🔧 Bienvenido a FerrePlus API");
 });
 
-// RUTAS
-app.use("/api/users", userRoute);
-app.use("/api/suppliers", supplierRoute);
-app.use("/api/products", productRoute);
-app.use("/api/movements", movementRoute);
-
-// INICIAR EL SERVIDOR
-app.listen(PORT, () => {
-  console.log(`Escuchando en el puerto http://localhost:${PORT}`);
-});
+// USAR TODAS LAS RUTAS
+app.use("/api", routes);
 
 // RUTAS QUE NO EXISTEN
 app.use((req, res, next) => {
-  res.status(404).send("Ruta no encontrada");
+  res.status(404).json({
+    success: false,
+    message: "🔍 Ruta no encontrada",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// INICIAR EL SERVIDOR
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
 });
