@@ -35,7 +35,7 @@ const getAllSuppliers = async (req, res) => {
         currentPage: page,
         totalPages: result.totalPages,
         totalSuppliers: result.totalSuppliers,
-        supplierPerPage: finalLimit,
+        suppliersPerPage: finalLimit,
         hasNextPage: page < result.totalPages,
         hasPreviousPage: page > 1,
       },

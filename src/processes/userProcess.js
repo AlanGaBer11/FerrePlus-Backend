@@ -73,6 +73,35 @@ const deleteUser = async (id) => {
   }
 };
 
+// ENVIAR CÓDIGO DE VERIFICACIÓN
+const sendVerificationCode = async (email) => {
+  try {
+    const result = await userService.sendVerificationCode(email);
+    return result;
+  } catch (error) {
+    console.error("Error al enviar el código de verificación:", error);
+    throw error;
+  }
+};
+
+// VERIFICAR CÓDIGO
+const verifyCode = async (email, code) => {
+  try {
+    const result = await userService.verifyCode(email, code);
+    return result;
+  } catch (error) {}
+};
+
+const resendVerificationCode = async (email) => {
+  try {
+    const result = await userService.resendVerificationCode(email);
+    return result;
+  } catch (err) {
+    console.error("Error al reenviar el código de verificación:", err);
+    throw err;
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -81,4 +110,7 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  sendVerificationCode,
+  verifyCode,
+  resendVerificationCode,
 };

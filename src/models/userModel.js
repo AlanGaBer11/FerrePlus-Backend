@@ -27,15 +27,26 @@ const User = sequelize.define(
       allowNull: true,
       defaultValue: "USER",
     },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    verificationCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    codeExpiration: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     tableName: "users",
-    timestamps: false,
-    freezeTableName: true,
+    timestamps: false, // Cambiar a false para evitar campos createdAt y updatedAt
   }
 );
 

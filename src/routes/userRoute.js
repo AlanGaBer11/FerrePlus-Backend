@@ -37,6 +37,10 @@ router
     authentication,
     checkRole(["ADMIN"]),
     userController.deleteUser
-  );
+  )
+  // NUEVAS RUTAS PARA VERIFICACIÓN
+  .post("/send-verification-code", userController.sendVerificationCode)
+  .post("/verify-code", userController.verifyCode)
+  .post("/resend-verification-code", userController.resendVerificationCode);
 
 module.exports = router;

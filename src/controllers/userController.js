@@ -200,6 +200,132 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// NUEVOS CONTROLADORES PARA VERIFICACIÓN
+const sendVerificationCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "El email es requerido",
+      });
+    }
+
+    const result = await userProcess.sendVerificationCode(email);
+
+    res.status(200).json({
+      success: true,
+      message: "Código de verificación enviado",
+      codeExpiration: result.codeExpiration,
+    });
+  } catch (error) {
+    console.error("Error al enviar código de verificación:", error);
+
+    // Manejar errores específicos
+    if (error.message === "El usuario no existe") {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    if (error.message === "El usuario ya está verificado") {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+};
+
+const verifyCode = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        success: false,
+        message: "Email y código son requeridos",
+      });
+    }
+
+    const result = await userProcess.verifyCode(email, code);
+
+    res.status(200).json({
+      success: true,
+      message: "Código verificado correctamente",
+      user: result.user,
+    });
+  } catch (error) {
+    console.error("Error al verificar código:", error);
+
+    // Manejar errores específicos
+    if (
+      error.message === "Usuario no encontrado" ||
+      error.message === "El usuario ya está verificado" ||
+      error.message === "No hay código de verificación pendiente" ||
+      error.message === "El código de verificación ha expirado" ||
+      error.message === "Código de verificación inválido"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+};
+
+const resendVerificationCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "El email es requerido",
+      });
+    }
+
+    const result = await userProcess.resendVerificationCode(email);
+
+    res.status(200).json({
+      success: true,
+      message: "Código de verificación reenviado",
+      codeExpiration: result.codeExpiration,
+    });
+  } catch (error) {
+    console.error("Error al reenviar código:", error);
+
+    // Manejar errores específicos
+    if (
+      error.message === "Usuario no encontrado" ||
+      error.message === "El usuario ya está verificado" ||
+      error.message.includes("Debes esperar")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -208,4 +334,7 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  sendVerificationCode,
+  verifyCode,
+  resendVerificationCode,
 };
