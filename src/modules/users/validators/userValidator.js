@@ -1,6 +1,6 @@
 const { check, validationResult } = require("express-validator");
 
-const newUserValidaror = [
+const newUserValidator = [
   check("name")
     .notEmpty()
     .withMessage("El nombre es obligatorio")
@@ -78,5 +78,5 @@ const newUserValidaror = [
 ];
 
 module.exports = {
-  newUserValidaror,
+  newUserValidator,
 };

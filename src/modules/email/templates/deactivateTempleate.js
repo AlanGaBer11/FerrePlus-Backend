@@ -20,9 +20,8 @@ const generate = (userData) => {
         ).toLocaleDateString("es-ES")}</strong></p>
       </div>
       
-      <p>Si crees que esto es un error, por favor contacta con nuestro equipo de soporte.</p>
-      <p>Lamentamos cualquier inconveniente.</p>
-      
+      <p>Para reactivar tu cuenta, por favor contacta con nuestro equipo de soporte.</p>
+      <p>Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos.</p>
       ${emailHelpers.getEmailFooter()}
     </div>
   `;

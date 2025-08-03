@@ -4,26 +4,42 @@ const productController = require("../controllers/productController");
 const validation = require("../validators/productValidator");
 const authentication = require("../../../shared/middlewares/authMiddleware");
 const { checkRole } = require("../../../shared/middlewares/rolMiddleware");
+const {
+  checkAccountStatus,
+} = require("../../../shared/middlewares/accountStatusMiddleware ");
 
 router
-  .get("/getProducts", authentication, productController.getAllProducts)
-  .get("/getProduct/:id", authentication, productController.getProductById)
+  .get(
+    "/getProducts",
+    authentication,
+    checkAccountStatus,
+    productController.getAllProducts
+  )
+  .get(
+    "/getProduct/:id",
+    authentication,
+    checkAccountStatus,
+    productController.getProductById
+  )
   .post(
     "/createProduct",
-    authentication,
-    checkRole(["ADMIN"]),
     validation.createProductValidator,
+    authentication,
+    checkAccountStatus,
+    checkRole(["ADMIN"]),
     productController.createProduct
   )
   .patch(
     "/updateProduct/:id",
     authentication,
+    checkAccountStatus,
     checkRole(["ADMIN"]),
     productController.updateProduct
   )
   .delete(
     "/deleteProduct/:id",
     authentication,
+    checkAccountStatus,
     checkRole(["ADMIN"]),
     productController.deleteProduct
   );

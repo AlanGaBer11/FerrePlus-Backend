@@ -4,26 +4,42 @@ const supplierController = require("../controllers/supplierController");
 const validation = require("../validators/supplierValidator");
 const authentication = require("../../../shared/middlewares/authMiddleware");
 const { checkRole } = require("../../../shared/middlewares/rolMiddleware");
+const {
+  checkAccountStatus,
+} = require("../../../shared/middlewares/accountStatusMiddleware ");
 
 router
-  .get("/getSuppliers", authentication, supplierController.getAllSuppliers)
-  .get("/getSupplier/:id", authentication, supplierController.getSupplierById)
+  .get(
+    "/getSuppliers",
+    authentication,
+    checkAccountStatus,
+    supplierController.getAllSuppliers
+  )
+  .get(
+    "/getSupplier/:id",
+    authentication,
+    checkAccountStatus,
+    supplierController.getSupplierById
+  )
   .post(
     "/createSupplier",
-    authentication,
-    checkRole(["ADMIN"]),
     validation.createSupplierValidator,
+    authentication,
+    checkAccountStatus,
+    checkRole(["ADMIN"]),
     supplierController.createSupplier
   )
   .patch(
     "/updateSupplier/:id",
     authentication,
+    checkAccountStatus,
     checkRole(["ADMIN"]),
     supplierController.updatedSupplier
   )
   .delete(
     "/deleteSupplier/:id",
     authentication,
+    checkAccountStatus,
     checkRole(["ADMIN"]),
     supplierController.deleteSupplier
   );

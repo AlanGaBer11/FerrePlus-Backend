@@ -1,37 +1,30 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
-
 const checkRole = (roles) => {
-  return async (req, res, next) => {
+  return (req, res, next) => {
     try {
-      const token = req.headers.authorization?.split(" ")[1];
-      if (!token) {
-        return res
-          .status(401)
-          .json({ succes: false, message: "Token Requerido" });
-      }
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findByPk(decoded.id);
+      // El usuario ya debe estar disponible desde authMiddleware
+      const user = req.user;
 
       if (!user) {
-        return res
-          .status(404)
-          .json({ succes: false, message: "Usuario No Encontrado" });
+        return res.status(401).json({
+          success: false,
+          message: "Usuario no autenticado",
+        });
       }
 
       if (!roles.includes(user.role)) {
         return res.status(403).json({
-          succes: false,
+          success: false,
           message: "No Tienes Permiso Para Realizar Esta Acción",
         });
       }
 
-      req.user = user;
       next();
     } catch (error) {
-      console.error("Error de autenticación:", error.message);
-      res.status(401).json({ succes: false, message: "Token Inválido" });
+      console.error("Error verificando rol:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
     }
   };
 };

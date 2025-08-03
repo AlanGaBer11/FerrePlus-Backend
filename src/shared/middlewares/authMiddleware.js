@@ -1,32 +1,44 @@
-/* AUTH MIDDLEWARE */
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   try {
     // Obtener el token del headers
-    const token = req.headers.authorization?.split(' ')[1]
+    const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Acceso Denegado, Token Requerido.'
-      })
+        message: "Acceso Denegado, Token Requerido.",
+      });
     }
 
     // Verificar el token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Agregar la información del usuario decodificada a la request
-    req.user = decoded
+    // Obtener el usuario completo de la BD
+    const user = await User.findByPk(decoded.id, {
+      attributes: { exclude: ["password", "verificationCode"] },
+    });
 
-    next()
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado",
+      });
+    }
+
+    // Agregar el usuario completo a la request
+    req.user = user;
+
+    next();
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: 'Token Invalido',
-      error: error.message
-    })
+      message: "Token Invalido",
+      error: error.message,
+    });
   }
-}
+};
 
-module.exports = authMiddleware
+module.exports = authMiddleware;
