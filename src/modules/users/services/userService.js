@@ -159,13 +159,73 @@ const deactivateUser = async (id) => {
     if (!user) {
       throw new Error("El usuario no existe");
     }
+    if (!user.status) {
+      throw new Error("El usuario ya está desactivado");
+    }
 
     // Soft delete - cambiar status a false
     await user.update({ status: false });
 
+    // Enviar correo de notificación usando template
+    try {
+      const disableData = {
+        name: user.name,
+        email: user.email,
+        disabledAt: new Date(),
+      };
+
+      const { subject, text, html } =
+        EmailTemplateService.getdeactivateEmail(disableData);
+      await sendEmail(user.email, subject, text, html);
+
+      console.log(`Correo de desactivación enviado a: ${user.email}`);
+    } catch (emailError) {
+      console.error("Error al enviar correo de desactivación:", emailError);
+    }
+
     return user;
   } catch (error) {
     console.error("Error al desactivar el usuario:", error);
+    throw error;
+  }
+};
+
+// FUNCIÓN PARA REACTIVAR CUENTA
+const reactivateUser = async (id) => {
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new Error("El usuario no existe");
+    }
+    if (user.status) {
+      throw new Error("El usuario ya está activo");
+    }
+
+    // Verificar que esté desactivado
+    if (user.status) {
+      throw new Error("El usuario ya está activo");
+    }
+
+    await user.update({ status: true });
+    // Enviar correo de reactivación usando template
+    try {
+      const reactivateData = {
+        name: user.name,
+        email: user.email,
+        reactiveAt: new Date(),
+      };
+
+      const { subject, text, html } =
+        EmailTemplateService.getReactivateEmail(reactivateData);
+      await sendEmail(user.email, subject, text, html);
+      console.log(`Correo de reactivación enviado a: ${user.email}`);
+    } catch (emailError) {
+      console.error("Error al enviar correo de reactivación:", emailError);
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Error al activar el usuario:", error);
     throw error;
   }
 };
@@ -177,4 +237,5 @@ module.exports = {
   updateUser,
   deleteUser,
   deactivateUser,
+  reactivateUser,
 };

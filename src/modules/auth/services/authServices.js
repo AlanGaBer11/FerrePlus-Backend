@@ -180,6 +180,11 @@ const verifyAccount = async (email, code) => {
   }
 };
 
+/* !! Agregar: 
+forgotPassword - Recuperar contraseña (futuro)
+resetPassword - Resetear contraseña (futuro)
+ */
+
 module.exports = {
   registerUser,
   loginUser,

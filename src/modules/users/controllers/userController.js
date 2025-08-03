@@ -137,6 +137,57 @@ const deleteUser = async (req, res) => {
       .json({ success: false, message: "Error interno del servidor" });
   }
 };
+const deactivateUser = async (req, res) => {
+  try {
+    const user = await userProcess.deactivateUser(req.params.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Usuario no encontrado" });
+    }
+    res.status(200).json({ success: true, message: "Usuario desactivado" });
+  } catch (error) {
+    console.error("Error al desactivar el usuario", error);
+
+    if (error.message === "El usuario no existe") {
+      return res.status(404).json({ success: false, message: error.message });
+    }
+
+    if (error.message === "El usuario ya está desactivado") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+
+    res
+      .status(500)
+      .json({ success: false, message: "Error interno del servidor" });
+  }
+};
+
+const reactivateUser = async (req, res) => {
+  try {
+    const user = await userProcess.reactivateUser(req.params.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Usuario no encontrado" });
+    }
+    res.status(200).json({ success: true, message: "Usuario reactivado" });
+  } catch (error) {
+    console.error("Error al reactivar el usuario", error);
+
+    if (error.message === "El usuario no existe") {
+      return res.status(404).json({ success: false, message: error.message });
+    }
+
+    if (error.message === "El usuario ya está activo") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+
+    res
+      .status(500)
+      .json({ success: false, message: "Error interno del servidor" });
+  }
+};
 
 module.exports = {
   getAllUsers,
@@ -144,4 +195,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  deactivateUser,
+  reactivateUser,
 };

@@ -42,10 +42,30 @@ const updateUser = async (id, userData) => {
 
 const deleteUser = async (id) => {
   try {
-    const deletedUser = await userService.deleteUser(id);
-    return deletedUser;
+    const user = await userService.deleteUser(id);
+    return user;
   } catch (err) {
     console.error("Error al eliminar usuario:", err);
+    throw err;
+  }
+};
+
+const deactivateUser = async (id) => {
+  try {
+    const user = await userService.deactivateUser(id);
+    return user;
+  } catch (err) {
+    console.error("Error al desactivar usuario:", err);
+    throw err;
+  }
+};
+
+const reactivateUser = async (id) => {
+  try {
+    const user = await userService.reactivateUser(id);
+    return user;
+  } catch (err) {
+    console.error("Error al reactivar usuario:", err);
     throw err;
   }
 };
@@ -56,4 +76,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  deactivateUser,
+  reactivateUser,
 };
