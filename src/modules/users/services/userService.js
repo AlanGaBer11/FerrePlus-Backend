@@ -6,34 +6,25 @@ const EmailTemplateService = require("../../email/services/emailTemplateService"
 // FUNCIÓN PARA OBTENER TODOS LOS USUARIOS (CON PAGINACIÓN)
 const getAllUsers = async (page = 1, limit = 10) => {
   try {
-    // Validar paginación simple
-    const validPage = Math.max(1, parseInt(page) || 1);
-    const validLimit = Math.min(100, Math.max(1, parseInt(limit) || 10));
-
     // Calcular el offset
-    const offset = (validPage - 1) * validLimit;
+    const offset = (page - 1) * limit;
 
     // Obtener usuarios con count y rows
     const { count, rows } = await User.findAndCountAll({
-      limit: validLimit,
+      limit: limit,
       offset: offset,
-      order: [["id_user", "DESC"]], // Más recientes primero
+      order: [["id_user", "ASC"]], //?? Más recientes primero
       attributes: { exclude: ["password", "verificationCode"] }, // Excluir datos sensibles
     });
 
     // Calcular el total de páginas
-    const totalPages = Math.ceil(count / validLimit);
+    const totalPages = Math.ceil(count / limit);
 
     return {
       users: rows,
-      pagination: {
-        currentPage: validPage,
-        totalPages,
-        totalItems: count,
-        itemsPerPage: validLimit,
-        hasNextPage: validPage < totalPages,
-        hasPrevPage: validPage > 1,
-      },
+      totalUsers: count,
+      totalPages: totalPages,
+      currentPage: page,
     };
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
