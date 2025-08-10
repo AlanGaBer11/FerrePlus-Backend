@@ -180,14 +180,102 @@ const verifyAccount = async (email, code) => {
   }
 };
 
-/* !! Agregar: 
-forgotPassword - Recuperar contraseña (futuro)
-resetPassword - Resetear contraseña (futuro)
- */
+// FUNCIÓN PARA SOLICITAR RESETEO DE CONTRASEÑA
+const requestPasswordReset = async (email) => {
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      throw new Error("El usuario no existe");
+    }
+
+    // Generar token de reseteo (6 dígitos)
+    const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Establecer expiración (15 minutos)
+    const tokenExpiration = new Date();
+    tokenExpiration.setMinutes(tokenExpiration.getMinutes() + 15);
+
+    // Guardar token y expiración
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = tokenExpiration;
+    await user.save();
+
+    // Enviar email con el código usando templates
+    const resetData = {
+      name: user.name,
+      resetToken,
+      tokenExpiration,
+    };
+
+    const { subject, text, html } =
+      EmailTemplateService.getRequestPasswordEmail(resetData);
+    await sendEmail(email, subject, text, html);
+
+    return { tokenExpiration };
+  } catch (error) {
+    console.error("Error al solicitar reseteo de contraseña:", error);
+    throw error;
+  }
+};
+
+// FUNCIÓN PARA RESETEAR CONTRASEÑA
+const resetPassword = async (email, token, newPassword) => {
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+
+    // Verificar si hay un token pendiente
+    if (!user.resetPasswordToken) {
+      throw new Error("No hay solicitud de reseteo pendiente");
+    }
+
+    // Verificar expiración
+    if (user.resetPasswordExpires && new Date() > user.resetPasswordExpires) {
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
+      await user.save();
+      throw new Error("El código de reseteo ha expirado");
+    }
+
+    // Verificar token
+    if (user.resetPasswordToken !== token) {
+      throw new Error("Código de reseteo inválido");
+    }
+
+    // Hashear nueva contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Actualizar contraseña y limpiar tokens
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    // Enviar confirmación por email
+    const resetConfirmData = {
+      name: user.name,
+      email: user.email,
+    };
+
+    const { subject, text, html } =
+      EmailTemplateService.getResetPasswordEmail(resetConfirmData);
+    await sendEmail(email, subject, text, html);
+
+    return true;
+  } catch (error) {
+    console.error("Error al resetear contraseña:", error);
+    throw error;
+  }
+};
 
 module.exports = {
   registerUser,
   loginUser,
   sendVerificationCode,
   verifyAccount,
+  requestPasswordReset,
+  resetPassword,
 };

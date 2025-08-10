@@ -14,7 +14,8 @@ const checkAccountStatus = (req, res, next) => {
     if (!user.verified) {
       return res.status(403).json({
         success: false,
-        message: "Cuenta no verificada. Por favor verifica tu email.",
+        message:
+          "Cuenta no verificada. Por favor verifica tu email para activar tu cuenta.",
       });
     }
 
@@ -22,7 +23,8 @@ const checkAccountStatus = (req, res, next) => {
     if (!user.status) {
       return res.status(403).json({
         success: false,
-        message: "Cuenta desactivada. Contacta al administrador.",
+        message:
+          "Cuenta desactivada. Contacta al administrador para reactivar ru cuenta.",
       });
     }
 

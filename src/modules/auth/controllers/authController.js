@@ -147,9 +147,85 @@ const verifyAccount = async (req, res) => {
   }
 };
 
+const requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "El email es requerido",
+      });
+    }
+
+    const result = await authProcess.requestPasswordReset(email);
+
+    res.status(200).json({
+      success: true,
+      message: "Código de reseteo enviado",
+      tokenExpiration: result.tokenExpiration,
+    });
+  } catch (error) {
+    console.error("Error al solicitar reseteo:", error);
+
+    if (error.message === "El usuario no existe") {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, token, newPassword } = req.body;
+
+    if (!email || !token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, token y nueva contraseña son requeridos",
+      });
+    }
+
+    await authProcess.resetPassword(email, token, newPassword);
+
+    res.status(200).json({
+      success: true,
+      message: "Contraseña actualizada correctamente",
+    });
+  } catch (error) {
+    console.error("Error al resetear contraseña:", error);
+
+    if (
+      error.message.includes("no encontrado") ||
+      error.message.includes("inválido") ||
+      error.message.includes("expirado") ||
+      error.message.includes("pendiente")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   sendVerificationCode,
   verifyAccount,
+  requestPasswordReset,
+  resetPassword,
 };

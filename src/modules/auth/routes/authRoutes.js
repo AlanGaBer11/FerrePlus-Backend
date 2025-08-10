@@ -11,6 +11,8 @@ router
   )
   .post("/login", validation.loginUserValidator, authController.loginUser)
   .post("/send-verification-code", authController.sendVerificationCode)
-  .post("/verify-account", authController.verifyAccount);
+  .post("/verify-account", authController.verifyAccount)
+  .post("/request-password-reset", authController.requestPasswordReset)
+  .post("/reset-password", authController.resetPassword);
 
 module.exports = router;

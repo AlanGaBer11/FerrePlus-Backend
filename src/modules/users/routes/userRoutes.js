@@ -48,7 +48,6 @@ router
     "/deactivateUser/:id",
     authentication,
     checkAccountStatus,
-    checkRole(["ADMIN"]),
     userController.deactivateUser
   )
   .patch(

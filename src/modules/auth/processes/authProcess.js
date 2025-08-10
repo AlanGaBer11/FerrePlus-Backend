@@ -40,9 +40,31 @@ const verifyAccount = async (email, code) => {
   }
 };
 
+const requestPasswordReset = async (email) => {
+  try {
+    const result = await authServices.requestPasswordReset(email);
+    return result;
+  } catch (error) {
+    console.error("Error al solicitar reseteo:", error);
+    throw error;
+  }
+};
+
+const resetPassword = async (email, token, newPassword) => {
+  try {
+    const result = await authServices.resetPassword(email, token, newPassword);
+    return result;
+  } catch (error) {
+    console.error("Error al resetear contraseña:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   sendVerificationCode,
   verifyAccount,
+  requestPasswordReset,
+  resetPassword,
 };
