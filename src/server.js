@@ -10,16 +10,6 @@ const corsOptions = require("./shared/config/cors");
 // IMPORTAR RUTAS PRINCIPALES
 const routes = require("./routes/index");
 
-// Sincronizar modelos con la base de datos
-sequelize
-  .sync({ alter: true }) // usar {force: true} solo en desarrollo
-  .then(() => {
-    console.log("✅ Modelos sincronizados con la base de datos");
-  })
-  .catch((error) => {
-    console.error("❌ Error al sincronizar modelos:", error);
-  });
-
 // INICIALIZAR LA APLICACIÓN
 const app = express();
 
@@ -65,9 +55,24 @@ app.use((req, res, next) => {
   });
 });
 
-// INICIAR EL SERVIDOR
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
-});
+// Sincronizar modelos con la base de datos
+if (process.env.NODE_ENV !== "production") {
+  sequelize
+    .sync({ alter: true })
+    .then(() => {
+      console.log("✅ Modelos sincronizados con la base de datos");
+    })
+    .catch((error) => {
+      console.error("❌ Error al sincronizar modelos:", error);
+    });
+}
 
-module.exports = app; // Exportar la aplicación para Vercel
+// INICIAR EL SERVIDOR SOLO EN DESARROLLO
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
+  });
+}
+
+// Exportar la aplicación para Vercel
+module.exports = app;
