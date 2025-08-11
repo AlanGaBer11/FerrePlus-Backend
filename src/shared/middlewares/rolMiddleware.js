@@ -1,7 +1,6 @@
 const checkRole = (roles) => {
   return (req, res, next) => {
     try {
-      // El usuario ya debe estar disponible desde authMiddleware
       const user = req.user;
 
       if (!user) {

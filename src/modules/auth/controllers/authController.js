@@ -38,7 +38,7 @@ const loginUser = async (req, res) => {
     const user = await authProcess.loginUser({ email, password });
     // Generar token
     const token = jwt.sign({ id: user.id_user }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "15m",
     });
     res.status(200).json({
       success: true,
