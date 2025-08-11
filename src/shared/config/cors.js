@@ -1,7 +1,8 @@
 const corsOptions = {
   origin: [
     "http://localhost:5173", // Frontend en desarrollo
-    "https://ferre-plus-frontend.vercel.app", // Producción
+    "https://ferre-plus-frontend.vercel.app", // Producción,
+    "https://ferre-plus-frontend-bz4ersdu5-alangaber11-gmailcoms-projects.vercel.app", // Producción alternativa
   ],
   credentials: true,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
