@@ -1,153 +1,92 @@
-const Product = require("../../../shared/models/productModel");
-const Supplier = require("../../../shared/models/supplierModel");
+const RepositoryConfig = require("../../../shared/config/repository");
 
-// FUNCIÓN PARA OBTENER TODOS LOS PRODUCTOS (CON PAGINACIÓN)
-const getAllProducts = async (page, limit) => {
-  try {
-    // Calcular el offset
-    const offset = (page - 1) * limit;
-
-    // Obtener productos con count y rows
-    const { count, rows } = await Product.findAndCountAll({
-      limit: limit,
-      offset: offset,
-      attributes: ["id_product", "name", "category", "price", "stock"], // Especificamos los atributos
-      include: [
-        {
-          model: Supplier,
-          as: "supplier",
-          attributes: ["id_supplier", "name"],
-        },
-      ],
-      order: [["id_product", "ASC"]],
-    });
-
-    // Calcular el total de páginas
-    const totalPages = Math.ceil(count / limit);
-
-    return {
-      products: rows,
-      totalProducts: count,
-      totalPages: totalPages,
-      currentPage: page,
-    };
-  } catch (error) {
-    console.error("Error al obtener productos:", error);
-    throw error;
+class ProductService {
+  constructor() {
+    this.productRepository = RepositoryConfig.getRepository("product");
+    this.supplierRepository = RepositoryConfig.getRepository("supplier");
   }
-};
 
-// FUNCIÓN PARA OBTENER UN PRODUCTO POR ID
-const getProductById = async (id) => {
-  try {
-    const product = await Product.findByPk(id, {
-      attributes: ["id_product", "name", "category", "price", "stock"], // Especificamos los atributos a mostrar
-      include: [
-        {
-          model: Supplier,
-          as: "supplier",
-          attributes: ["id_supplier", "name"],
-        },
-      ],
-    });
-    if (!product) {
-      throw new Error("Producto no encontrado");
+  async getAllProducts(page = 1, limit = 10) {
+    try {
+      return await this.productRepository.findAll(page, limit);
+    } catch (error) {
+      console.error("Error al obtener productos:", error);
+      throw error;
     }
-    return product;
-  } catch (error) {
-    console.error("Error al obtener el producto:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA CREAR UN PRODUCTO
-const createProduct = async (productData) => {
-  const { name, category, price, stock, supplier_name } = productData;
-  try {
-    // Verificar si el producto ya existe
-    const existingProduct = await Product.findOne({ where: { name } });
-    if (existingProduct) {
-      throw new Error("El producto ya está registrado");
+  async getProductById(id) {
+    try {
+      const product = await this.productRepository.findById(id);
+      if (!product) {
+        throw new Error("Producto no encontrado");
+      }
+      return product;
+    } catch (error) {
+      console.error("Error al obtener el producto:", error);
+      throw error;
     }
-
-    // Buscar el proveedor por nombre
-    const supplier = await Supplier.findOne({ where: { name: supplier_name } });
-    if (!supplier) {
-      throw new Error("Proveedor no encontrado");
-    }
-
-    const product = await Product.create({
-      name,
-      category,
-      price,
-      stock,
-      id_supplier: supplier.id_supplier, // Usamos el ID del proveedor encontrado
-    });
-
-    return product;
-  } catch (error) {
-    console.error("Error al crear un producto:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA ACTUALIZAR UN PRODUCTO
-const updateProduct = async (id, productData) => {
-  const { name, category, price, stock, supplier_name } = productData;
-  try {
-    const product = await Product.findByPk(id);
-    if (!product) {
-      throw new Error("El producto no existe");
-    }
+  async createProduct(productData) {
+    try {
+      const { name, supplier_name } = productData;
 
-    // Buscar el proveedor por nombre si se proporciona
-    let id_supplier;
-    if (supplier_name) {
-      const supplier = await Supplier.findOne({
-        where: { name: supplier_name },
-      });
+      // Verificar si el producto ya existe
+      const existingProduct = await this.productRepository.findByName(name);
+      if (existingProduct) {
+        throw new Error("El producto ya está registrado");
+      }
+
+      // Buscar el proveedor
+      const supplier = await this.supplierRepository.findByName(supplier_name);
       if (!supplier) {
         throw new Error("Proveedor no encontrado");
       }
-      id_supplier = supplier.id_supplier;
+
+      // Crear el producto con el id del proveedor
+      const productToCreate = {
+        ...productData,
+        id_supplier: supplier.id_supplier,
+      };
+
+      return await this.productRepository.create(productToCreate);
+    } catch (error) {
+      console.error("Error al crear un producto:", error);
+      throw error;
     }
-
-    // Actualizar el producto con el id_supplier encontrado
-    await product.update({
-      name,
-      category,
-      price,
-      stock,
-      id_supplier: id_supplier || product.id_supplier,
-    });
-
-    return product;
-  } catch (error) {
-    console.error("Error al actualizar el producto:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA ELIMINAR UN PRODUCTO
-const deleteProduct = async (id) => {
-  try {
-    const product = await Product.findByPk(id);
-    if (!product) {
-      throw new Error("El producto no existe");
+  async updateProduct(id, productData) {
+    try {
+      const { supplier_name, ...updateData } = productData;
+
+      // Si se proporciona un nuevo proveedor, obtener su ID
+      if (supplier_name) {
+        const supplier = await this.supplierRepository.findByName(
+          supplier_name
+        );
+        if (!supplier) {
+          throw new Error("Proveedor no encontrado");
+        }
+        updateData.id_supplier = supplier.id_supplier;
+      }
+
+      return await this.productRepository.update(id, updateData);
+    } catch (error) {
+      console.error("Error al actualizar el producto:", error);
+      throw error;
     }
-
-    await product.destroy();
-    return product;
-  } catch (error) {
-    console.error("Error al eliminar el producto:", error);
-    throw error;
   }
-};
 
-module.exports = {
-  getAllProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-};
+  async deleteProduct(id) {
+    try {
+      return await this.productRepository.delete(id);
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+      throw error;
+    }
+  }
+}
+
+module.exports = new ProductService();

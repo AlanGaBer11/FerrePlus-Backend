@@ -1,111 +1,64 @@
-const Supplier = require("../../../shared/models/supplierModel");
-
-// FUNCIÓN PARA OBTENER TODOS LOS PROVEEDORES (CON PAGINACIÓN)
-const getAllSuppliers = async (page, limit) => {
-  try {
-    // Calcular el offset
-    const offset = (page - 1) * limit;
-
-    // Obtener proveedores con count y rows
-
-    const { count, rows } = await Supplier.findAndCountAll({
-      limit: limit,
-      offset: offset,
-      order: [["id_supplier", "ASC"]],
-    });
-
-    // Calcula el total de páginas
-    const totalPages = Math.ceil(count / limit);
-
-    return {
-      suppliers: rows,
-      totalSuppliers: count,
-      totalPages: totalPages,
-      currentPage: page,
-    };
-  } catch (error) {
-    console.error("Error al obtener proveedores:", error);
-    throw error;
+const RepositoryConfig = require("../../../shared/config/repository");
+class SupplierService {
+  constructor() {
+    this.supplierRepository = RepositoryConfig.getRepository("supplier");
   }
-};
 
-// FUNCIÓN PARA OBTENER UN PROVEEDOR POR ID
-const getSupplierById = async (id) => {
-  try {
-    const supplier = await Supplier.findByPk(id);
-    if (!supplier) {
-      throw new Error("Proveedor no encontrado");
+  async getAllSuppliers(page = 1, limit = 10) {
+    try {
+      return await this.supplierRepository.findAll(page, limit);
+    } catch (error) {
+      console.error("Error al obtener proveedores:", error);
+      throw error;
     }
-    return supplier;
-  } catch (error) {
-    console.error("Error al obtener el proveedor:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA CREAR UN PROVEEDOR
-const createSupplier = async (supplierData) => {
-  const { name, phone, address, email } = supplierData;
-  try {
-    // VERIFICAR SI EL PROVEEDOR YA EXISTE POR SU NOMBRE
-    const existingSupplier = await Supplier.findOne({
-      where: { name },
-    });
-
-    if (existingSupplier) {
-      throw new Error("El proveedor ya está registrado");
+  async getSupplierById(id) {
+    try {
+      const supplier = await this.supplierRepository.findById(id);
+      if (!supplier) {
+        throw new Error("Proveedor no encontrado");
+      }
+      return supplier;
+    } catch (error) {
+      console.error("Error al obtener el proveedor:", error);
+      throw error;
     }
-
-    const supplier = await Supplier.create({
-      name,
-      phone,
-      address,
-      email,
-    });
-
-    return supplier;
-  } catch (error) {
-    console.error("Error al crear un proveedor:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA ACTUALIZAR UN PROVEEDOR
-const updateSupplier = async (id, supplierData) => {
-  try {
-    const supplier = await Supplier.findByPk(id);
-    if (!supplier) {
-      throw new Error("El proveedor no existe");
+  async createSupplier(supplierData) {
+    try {
+      const existingSupplier = await this.supplierRepository.findByName(
+        supplierData.name
+      );
+      if (existingSupplier) {
+        throw new Error("El proveedor ya está registrado");
+      }
+
+      return await this.supplierRepository.create(supplierData);
+    } catch (error) {
+      console.error("Error al crear un proveedor:", error);
+      throw error;
     }
-
-    await supplier.update(supplierData);
-    return supplier;
-  } catch (error) {
-    console.error("Error al actualizar el proveedor:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA ELIMINAR UN PROVEEDOR
-const deleteSupplier = async (id) => {
-  try {
-    const supplier = await Supplier.findByPk(id);
-    if (!supplier) {
-      throw new Error("El proveedor no existe");
+  async updateSupplier(id, supplierData) {
+    try {
+      return await this.supplierRepository.update(id, supplierData);
+    } catch (error) {
+      console.error("Error al actualizar el proveedor:", error);
+      throw error;
     }
-
-    await supplier.destroy();
-    return supplier;
-  } catch (error) {
-    console.error("Error al eliminar el proveedor:", error);
-    throw error;
   }
-};
 
-module.exports = {
-  getAllSuppliers,
-  getSupplierById,
-  createSupplier,
-  updateSupplier,
-  deleteSupplier,
-};
+  async deleteSupplier(id) {
+    try {
+      return await this.supplierRepository.delete(id);
+    } catch (error) {
+      console.error("Error al eliminar el proveedor:", error);
+      throw error;
+    }
+  }
+}
+
+module.exports = new SupplierService();

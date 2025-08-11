@@ -4,9 +4,9 @@ const getAllUsers = async (page, limit) => {
   try {
     const users = await userService.getAllUsers(page, limit);
     return users;
-  } catch (err) {
-    console.error("Error al obtener usuarios:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al obtener usuarios:", error);
+    throw error;
   }
 };
 
@@ -14,9 +14,9 @@ const getUserById = async (id) => {
   try {
     const user = await userService.getUserById(id);
     return user;
-  } catch (err) {
-    console.error("Error al obtener el usuario:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al obtener el usuario:", error);
+    throw error;
   }
 };
 
@@ -24,9 +24,9 @@ const createUser = async (userData) => {
   try {
     const newUser = await userService.createUser(userData);
     return newUser;
-  } catch (err) {
-    console.error("Error al crear el usuario", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al crear el usuario", error);
+    throw error;
   }
 };
 
@@ -34,9 +34,9 @@ const updateUser = async (id, userData) => {
   try {
     const updatedUser = await userService.updateUser(id, userData);
     return updatedUser;
-  } catch (err) {
-    console.error("Error al actualizar usuario:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al actualizar usuario:", error);
+    throw error;
   }
 };
 
@@ -44,9 +44,9 @@ const deleteUser = async (id) => {
   try {
     const user = await userService.deleteUser(id);
     return user;
-  } catch (err) {
-    console.error("Error al eliminar usuario:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al eliminar usuario:", error);
+    throw error;
   }
 };
 
@@ -54,9 +54,9 @@ const deactivateUser = async (id) => {
   try {
     const user = await userService.deactivateUser(id);
     return user;
-  } catch (err) {
-    console.error("Error al desactivar usuario:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al desactivar usuario:", error);
+    throw error;
   }
 };
 
@@ -64,9 +64,9 @@ const reactivateUser = async (id) => {
   try {
     const user = await userService.reactivateUser(id);
     return user;
-  } catch (err) {
-    console.error("Error al reactivar usuario:", err);
-    throw err;
+  } catch (error) {
+    console.error("Error al reactivar usuario:", error);
+    throw error;
   }
 };
 

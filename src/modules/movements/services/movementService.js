@@ -1,177 +1,105 @@
-const Movement = require("../../../shared/models/movementModel");
-const Product = require("../../../shared/models/productModel");
-const User = require("../../../shared/models/userModel");
+const RepositoryConfig = require("../../../shared/config/repository");
 
-// FUNCIÓN PARA OBTENER TODOS LOS MOVIMIENTOS (CON PAGINACIÓN)
-const getAllMovements = async (page, limit) => {
-  try {
-    // Calcular el offset
-    const offset = (page - 1) * limit;
-
-    // Obtener movimientos con count y rows
-    const { count, rows } = await Movement.findAndCountAll({
-      limit: limit,
-      offset: offset,
-      attributes: ["id_movement", "type", "quantity", "date", "comments"],
-      include: [
-        {
-          model: Product,
-          as: "product",
-          attributes: ["id_product", "name"],
-        },
-        {
-          model: User,
-          as: "user",
-          attributes: ["id_user", "name", "email"],
-        },
-      ],
-      order: [["id_movement", "ASC"]],
-    });
-
-    // Calcular el total de página
-    const totalPages = Math.ceil(count / limit);
-
-    return {
-      movements: rows,
-      totalMovements: count,
-      totalPages: totalPages,
-      currentPage: page,
-    };
-  } catch (error) {
-    console.error("Error al obtener movimientos:", error);
-    throw error;
+class MovementService {
+  constructor() {
+    this.movementRepository = RepositoryConfig.getRepository("movement");
+    this.productRepository = RepositoryConfig.getRepository("product");
+    this.userRepository = RepositoryConfig.getRepository("user");
   }
-};
 
-// FUNCIÓN PARA OBTENER UN MOVIMIENTO POR ID
-const getMovementById = async (id) => {
-  try {
-    const movement = await Movement.findByPk(id, {
-      attributes: ["id_movement", "type", "quantity", "date", "comments"],
-
-      include: [
-        {
-          model: Product,
-          as: "product",
-          attributes: ["id_product", "name"],
-        },
-        {
-          model: User,
-          as: "user",
-          attributes: ["id_user", "name", "email"],
-        },
-      ],
-    });
-    if (!movement) {
-      throw new Error("Movimiento no encontrado");
+  async getAllMovements(page = 1, limit = 10) {
+    try {
+      return await this.movementRepository.findAll(page, limit);
+    } catch (error) {
+      console.error("Error al obtener movimientos:", error);
+      throw error;
     }
-    return movement;
-  } catch (error) {
-    console.error("Error al obtener el movimiento:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA CREAR UN MOVIMIENTO
-const createMovement = async (movementData) => {
-  const { type, quantity, date, comments, product_name, user_name } =
-    movementData;
-  try {
-    // Buscar el producto por su nombre
-    const product = await Product.findOne({ where: { name: product_name } });
-    if (!product) {
-      throw new Error("Producto no encontrado");
+  async getMovementById(id) {
+    try {
+      const movement = await this.movementRepository.findById(id);
+      if (!movement) {
+        throw new Error("Movimiento no encontrado");
+      }
+      return movement;
+    } catch (error) {
+      console.error("Error al obtener el movimiento:", error);
+      throw error;
     }
-
-    // Buscar el usuario por su nombre
-    const user = await User.findOne({ where: { name: user_name } });
-    if (!user) {
-      throw new Error("Usuario no encontrado");
-    }
-
-    const movement = await Movement.create({
-      type,
-      quantity,
-      date,
-      comments,
-      id_product: product.id_product,
-      id_user: user.id_user,
-    });
-
-    return movement;
-  } catch (error) {
-    console.error("Error al crear movimiento:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA ACTUALIZAR UN MOVIMIENTO
-const updateMovement = async (id, movementData) => {
-  const { type, quantity, date, comments, product_name, user_name } =
-    movementData;
-  try {
-    const movement = await Movement.findByPk(id);
-    if (!movement) {
-      throw new Error("El movimiento no existe");
-    }
-    // Buscar el producto por nombre si se proporciona
-    let id_product;
-    if (product_name) {
-      const product = await Product.findOne({
-        where: { name: product_name },
+  async createMovement(movementData) {
+    try {
+      const { product_name, user_name, type, quantity, ...otherData } =
+        movementData;
+
+      // Buscar producto y usuario
+      const product = await this.productRepository.findByName(product_name);
+      if (!product) throw new Error("Producto no encontrado");
+
+      const user = await this.userRepository.findByName(user_name);
+      if (!user) throw new Error("Usuario no encontrado");
+
+      // Actualizar stock del producto
+      const newStock =
+        type === "Entrada"
+          ? product.stock + quantity
+          : product.stock - quantity;
+
+      if (newStock < 0) {
+        throw new Error("Stock insuficiente para realizar la salida");
+      }
+
+      // Crear el movimiento
+      const movement = await this.movementRepository.create({
+        ...otherData,
+        type,
+        quantity,
+        id_product: product.id_product,
+        id_user: user.id_user,
       });
-      if (!product) {
-        throw new Error("Producto no encontrado");
-      }
-      id_product = product.id_product;
+
+      return movement;
+    } catch (error) {
+      console.error("Error al crear movimiento:", error);
+      throw error;
     }
-
-    // Buscar el usuario por nombre si se proporciona
-    let id_user;
-    if (user_name) {
-      const user = await User.findOne({ where: { name: user_name } });
-      if (!user) {
-        throw new Error("Usuario no encontrado");
-      }
-      id_user = user.id_user;
-    }
-
-    await movement.update({
-      type,
-      quantity,
-      date,
-      comments,
-      id_product: id_product || movement.id_product,
-      id_user: id_user || movement.id_user,
-    });
-
-    return movement;
-  } catch (error) {
-    console.error("Error al actualizar el movimiento:", error);
-    throw error;
   }
-};
 
-// FUNCIÓN PARA ELIMINAR UN MOVIMIENTO
-const deleteMovement = async (id) => {
-  try {
-    const movement = await Movement.findByPk(id);
-    if (!movement) {
-      throw new Error("El movimiento no existe");
+  async updateMovement(id, movementData) {
+    try {
+      const { product_name, user_name, ...updateData } = movementData;
+
+      // Si se proporciona un nuevo producto
+      if (product_name) {
+        const product = await this.productRepository.findByName(product_name);
+        if (!product) throw new Error("Producto no encontrado");
+        updateData.id_product = product.id_product;
+      }
+
+      // Si se proporciona un nuevo usuario
+      if (user_name) {
+        const user = await this.userRepository.findByName(user_name);
+        if (!user) throw new Error("Usuario no encontrado");
+        updateData.id_user = user.id_user;
+      }
+
+      return await this.movementRepository.update(id, updateData);
+    } catch (error) {
+      console.error("Error al actualizar el movimiento:", error);
+      throw error;
     }
-
-    await movement.destroy();
-    return movement;
-  } catch (error) {
-    console.error("Error al eliminar el movimiento:", error);
-    throw error;
   }
-};
 
-module.exports = {
-  getAllMovements,
-  getMovementById,
-  createMovement,
-  updateMovement,
-  deleteMovement,
-};
+  async deleteMovement(id) {
+    try {
+      return await this.movementRepository.delete(id);
+    } catch (error) {
+      console.error("Error al eliminar el movimiento:", error);
+      throw error;
+    }
+  }
+}
+
+module.exports = new MovementService();
