@@ -73,6 +73,3 @@ if (process.env.NODE_ENV !== "production") {
     console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
   });
 }
-
-// Exportar la aplicación para Vercel
-module.exports = app;
