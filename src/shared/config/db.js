@@ -6,17 +6,32 @@ class Database {
       return Database.instance;
     }
 
-    this.sequelize = new Sequelize({
-      database: process.env.DB_NAME,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
+    /*     this.sequelize = new Sequelize({
+      database: process.env.DB_NAME_LOCAL,
+      username: process.env.DB_USER_LOCAL,
+      password: process.env.DB_PASSWORD_LOCAL,
+      host: process.env.DB_HOST_LOCAL,
+      port: process.env.DB_PORT_LOCAL,
       dialect: "postgres",
       logging: false,
       define: {
         timestamps: true,
         underscored: true,
+      },
+    }); */
+
+    this.sequelize = new Sequelize(process.env.POSTGRES_URI_PROD, {
+      dialect: "postgres",
+      logging: false,
+      define: {
+        timestamps: true,
+        underscored: true,
+      },
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
       },
     });
 
