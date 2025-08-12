@@ -132,11 +132,21 @@ const deleteUser = async (req, res) => {
     res.status(200).json({ success: true, message: "Usuario eliminado" });
   } catch (error) {
     console.error("Error al eliminar el usuario", error);
+
+    // ✅ Enviar mensaje de error específico
+    if (
+      error.message === "Usuario no encontrado" ||
+      error.message === "No se puede eliminar un usuario con rol ADMIN"
+    ) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+
     res
       .status(500)
       .json({ success: false, message: "Error interno del servidor" });
   }
 };
+
 const deactivateUser = async (req, res) => {
   try {
     const user = await userProcess.deactivateUser(req.params.id);
@@ -149,11 +159,12 @@ const deactivateUser = async (req, res) => {
   } catch (error) {
     console.error("Error al desactivar el usuario", error);
 
-    if (error.message === "El usuario no existe") {
-      return res.status(404).json({ success: false, message: error.message });
-    }
-
-    if (error.message === "El usuario ya está desactivado") {
+    // ✅ Enviar mensaje de error específico
+    if (
+      error.message === "Usuario no encontrado" ||
+      error.message === "Usuario ya está desactivado" ||
+      error.message === "No se puede desactivar un usuario con rol ADMIN"
+    ) {
       return res.status(400).json({ success: false, message: error.message });
     }
 

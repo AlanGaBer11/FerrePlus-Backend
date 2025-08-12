@@ -41,10 +41,15 @@ class UserRepository extends IUserRepository {
     if (!user) throw new Error("Usuario no encontrado");
     return await user.update(userData);
   }
-
   async delete(id) {
     const user = await this.findById(id);
     if (!user) throw new Error("Usuario no encontrado");
+
+    // 🚫 Evitar borrar un usuario con rol ADMIN
+    if (user.role && user.role.toUpperCase() === "ADMIN") {
+      throw new Error("No se puede eliminar un usuario con rol ADMIN");
+    }
+
     await user.destroy();
     return user;
   }
@@ -52,6 +57,12 @@ class UserRepository extends IUserRepository {
   async deactivate(id) {
     const user = await this.findById(id);
     if (!user) throw new Error("Usuario no encontrado");
+
+    // 🚫 Evitar desactivar un usuario con rol ADMIN
+    if (user.role && user.role.toUpperCase() === "ADMIN") {
+      throw new Error("No se puede desactivar un usuario con rol ADMIN");
+    }
+
     if (!user.status) throw new Error("Usuario ya está desactivado");
     return await user.update({ status: false });
   }
